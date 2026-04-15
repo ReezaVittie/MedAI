@@ -533,8 +533,19 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- viewport-fit=cover lets env(safe-area-inset-*) work on notched iPhones -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MedAI — Medical Assistant</title>
+
+  <!-- iOS PWA: full-screen when added to Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MedAI" />
+
+  <!-- Android PWA / Chrome toolbar colour -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#040c18" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -543,6 +554,28 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 input, textarea { font-family: inherit; }
+
+/* ─── Universal mobile fixes ─────────────────────────────────
+   Applied on every device — harmless on desktop, essential on phones.
+   ─────────────────────────────────────────────────────────── */
+
+/* Prevent the blue/grey tap-flash on iOS and Android */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Eliminate the 300 ms tap delay and block double-tap zoom on all
+   interactive elements without disabling pinch-zoom (accessible). */
+button, a, [role="button"], input, textarea, select, label {
+  touch-action: manipulation;
+}
+
+/* Stop iOS from showing a context-menu popup on long-press of buttons */
+button, a { -webkit-touch-callout: none; }
+
+/* Prevent iOS from auto-scaling text on device rotation */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Stop Android Chrome pull-to-refresh from firing inside the chat */
+body { overscroll-behavior-y: none; }
 
 /* ─── Variables ──────────────────────────────────────── */
 :root {
@@ -606,7 +639,11 @@ html, body {
 }
 
 /* ─── App Shell ──────────────────────────────────────── */
-.app { display: flex; height: 100vh; overflow: hidden; }
+/* --real-vh is set by JS using visualViewport so it tracks the VISIBLE
+   window height on both iOS (which counts the address bar in 100vh) and
+   Android (where the keyboard shrinks the viewport).  Falls back to 100vh
+   if JS hasn't run yet (SSR / no-JS). */
+.app { display: flex; height: 100vh; height: var(--real-vh, 100vh); overflow: hidden; }
 
 /* SIDEBAR */
 .sidebar {
@@ -2169,6 +2206,47 @@ async function deleteMedicalProfile() {
     alert('Failed to delete medical profile');
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   iOS & Android keyboard / viewport fix
+   ─────────────────────────────────────────────────────────────────────────
+   Problem:
+     • iOS Safari counts the collapsing URL bar in 100vh, so the app shell
+       is always slightly taller than the visible area.
+     • On both iOS and Android, opening the soft keyboard shrinks the visible
+       viewport — layouts using 100vh end up with the input hidden behind
+       the keyboard.
+   Solution:
+     • Read the actual visible height from window.visualViewport (iOS 13+,
+       Android Chrome 61+) and write it to --real-vh.
+     • .app uses height: var(--real-vh, 100vh) so it always fits the screen.
+     • When the keyboard opens we also scroll the chat to the bottom so the
+       latest message and the input box stay visible.
+   ───────────────────────────────────────────────────────────────────────── */
+(function initViewportFix() {
+  function applyVH() {
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--real-vh', h + 'px');
+  }
+
+  applyVH();
+
+  if (window.visualViewport) {
+    // Fires when the keyboard opens or closes on iOS and Android Chrome
+    window.visualViewport.addEventListener('resize', function () {
+      applyVH();
+      scrollBottom(); // keep input in view when keyboard opens
+    });
+    window.visualViewport.addEventListener('scroll', applyVH);
+  }
+
+  // Fallback for older browsers
+  window.addEventListener('resize', applyVH);
+  // Re-measure after the browser finishes rotating
+  window.addEventListener('orientationchange', function () {
+    setTimeout(applyVH, 300);
+  });
+})();
 </script>
 
 <!-- Medical Profile Modal -->
@@ -2648,8 +2726,13 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>{{ page_title }} — MedAI</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MedAI" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#040c18" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
