@@ -13,6 +13,11 @@ Then open http://127.0.0.1:5000 in your browser.
 import hashlib
 import html as html_mod
 import json
+import sys
+
+# Raise recursion limit — gevent's SSL/socket monkey-patching and Python's re
+# engine both create deep call stacks that exceed the default limit of 1000.
+sys.setrecursionlimit(10000)
 import os
 import re
 import time

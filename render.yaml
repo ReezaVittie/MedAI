@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn -k gevent -w 1 --timeout 120 --bind 0.0.0.0:$PORT MedAI:app
+    startCommand: gunicorn -k gthread --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT MedAI:app
     envVars:
       - key: FLASK_ENV
         value: production
