@@ -2847,37 +2847,52 @@ def get_emergency_numbers_region(country, region):
 @app.route("/api/chat", methods=["POST"])
 @_require_login
 def chat():
-    body = request.get_json(force=True)
-    conv_id: str = body.get("conv_id", "")
-    user_text: str = body.get("message", "").strip()
+    try:
+        body = request.get_json(force=True)
+        if not body:
+            return jsonify({"error": "Invalid request body"}), 400
 
-    if not user_text:
-        return jsonify({"error": "Empty message"}), 400
+        conv_id: str = body.get("conv_id", "")
+        user_text: str = body.get("message", "").strip()
 
-    _ensure_loaded()
-    conv = next((c for c in _convs if c["id"] == conv_id), None)
-    if conv is None:
-        return jsonify({"error": "Conversation not found"}), 404
+        if not user_text:
+            return jsonify({"error": "Empty message"}), 400
 
-    # Build API history from existing messages
-    user_email = session.get('user_email')
-    medical_context = ""
-    if user_email:
-        medical_profile = get_medical_profile(user_email)
-        if medical_profile and medical_profile.get('consent_given'):
-            medical_context = f"\n\nUSER MEDICAL PROFILE (use only with explicit consent for safety guidance):\n{json.dumps(medical_profile, indent=2)}"
-    
-    enhanced_prompt = SYSTEM_PROMPT + medical_context
-    api_messages = [{"role": "system", "content": enhanced_prompt}]
-    for m in conv["messages"]:
-        clean = _RE_TAGS.sub("", m["content"].replace("<br>", "\n"))
-        api_messages.append({"role": m["role"], "content": clean})
-    api_messages.append({"role": "user", "content": user_text})
+        _ensure_loaded()
+        conv = next((c for c in _convs if c["id"] == conv_id), None)
+        if conv is None:
+            return jsonify({"error": "Conversation not found"}), 404
 
-    timestamp = datetime.now().strftime("%I:%M %p")
+        # Build API history from existing messages
+        user_email = session.get("user_email")
+        medical_context = ""
+        try:
+            if user_email:
+                medical_profile = get_medical_profile(user_email)
+                if medical_profile and medical_profile.get("consent_given"):
+                    medical_context = (
+                        f"\n\nUSER MEDICAL PROFILE (use only with explicit consent):\n"
+                        f"{json.dumps(medical_profile, indent=2)}"
+                    )
+        except Exception:
+            pass  # Medical profile is optional — never block chat for this
+
+        enhanced_prompt = SYSTEM_PROMPT + medical_context
+        api_messages = [{"role": "system", "content": enhanced_prompt}]
+        for m in conv["messages"]:
+            clean = _RE_TAGS.sub("", m["content"].replace("<br>", "\n"))
+            api_messages.append({"role": m["role"], "content": clean})
+        api_messages.append({"role": "user", "content": user_text})
+
+        timestamp = datetime.now().strftime("%I:%M %p")
+
+    except Exception as exc:
+        return jsonify({"error": f"Request setup failed: {str(exc)}"}), 500
 
     def generate():
         chunks: list[str] = []
+
+        # ── Stream from Cohere ────────────────────────────────────────────────
         try:
             resp = _http.post(
                 COHERE_URL,
@@ -2923,28 +2938,33 @@ def chat():
             yield f'data: {json.dumps({"error": str(exc)})}\n\n'
             return
 
-        # Persist both messages and send the final event
-        raw_reply = "".join(chunks)
-        html_reply = format_reply(raw_reply)
+        # ── Persist and send done event ───────────────────────────────────────
+        try:
+            raw_reply = "".join(chunks)
+            html_reply = format_reply(raw_reply) if raw_reply else "<p>No response received.</p>"
 
-        conv["messages"].append({
-            "role": "user",
-            "content": user_text.replace("\n", "<br>"),
-            "time": timestamp,
-        })
-        if len(conv["messages"]) == 1:
-            conv["title"] = user_text[:46] + ("…" if len(user_text) > 46 else "")
-        conv["messages"].append({
-            "role": "assistant",
-            "content": html_reply,
-            "time": timestamp,
-        })
-        _flush()
+            conv["messages"].append({
+                "role": "user",
+                "content": user_text.replace("\n", "<br>"),
+                "time": timestamp,
+            })
+            if len(conv["messages"]) == 1:
+                conv["title"] = user_text[:46] + ("…" if len(user_text) > 46 else "")
+            conv["messages"].append({
+                "role": "assistant",
+                "content": html_reply,
+                "time": timestamp,
+            })
 
-        # Generate follow-up questions
-        follow_up_questions = generate_follow_up_questions(api_messages + [{"role": "assistant", "content": raw_reply}])
+            try:
+                _flush()
+            except Exception as flush_err:
+                print(f"[MedAI] Warning: could not save conversation: {flush_err}")
 
-        yield f'data: {json.dumps({"done": True, "conv": conv, "follow_up": follow_up_questions})}\n\n'
+            yield f'data: {json.dumps({"done": True, "conv": conv})}\n\n'
+
+        except Exception as exc:
+            yield f'data: {json.dumps({"error": f"Failed to save response: {str(exc)}"}  )}\n\n'
 
     return Response(
         stream_with_context(generate()),
@@ -2953,60 +2973,6 @@ def chat():
     )
 
 
-def generate_follow_up_questions(messages: list) -> list[str]:
-    """Generate 3 relevant follow-up questions based on the conversation"""
-    try:
-        # Create a prompt for generating follow-up questions
-        follow_up_prompt = """Based on this medical conversation, generate exactly 3 relevant follow-up questions that the patient might ask next. 
-        Make them specific, natural, and helpful for continuing the medical discussion.
-        Format them as a numbered list like:
-        1. Question one?
-        2. Question two?
-        3. Question three?
-
-        Conversation:
-        """
-
-        # Add the last few messages for context (limit to avoid token limits)
-        context_messages = messages[-6:]  # Last 3 exchanges
-        for msg in context_messages:
-            role = "Patient" if msg["role"] == "user" else "Doctor"
-            follow_up_prompt += f"{role}: {msg['content']}\n"
-
-        follow_up_messages = [
-            {"role": "system", "content": "You are a helpful assistant that generates relevant follow-up questions for medical conversations. Keep questions concise and medically appropriate."},
-            {"role": "user", "content": follow_up_prompt}
-        ]
-
-        resp = _http.post(
-            COHERE_URL,
-            json={"model": COHERE_MODEL, "messages": follow_up_messages, "max_tokens": 200},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-
-        if "message" in data and "content" in data["message"]:
-            response_text = data["message"]["content"][0]["text"].strip()
-            
-            # Parse the numbered list
-            questions = []
-            lines = response_text.split('\n')
-            for line in lines:
-                line = line.strip()
-                if line and (line[0].isdigit() and line[1:3] in ['. ', ') ']):
-                    # Extract the question after the number
-                    question = line.split('. ', 1)[-1] if '. ' in line else line.split(') ', 1)[-1]
-                    if question.endswith('?'):
-                        questions.append(question)
-            
-            # Return up to 3 questions
-            return questions[:3]
-        
-    except Exception as e:
-        print(f"Error generating follow-up questions: {e}")
-    
-    return []
 
 
 # ── Markdown-like → HTML formatter (uses pre-compiled patterns) ───────────────
