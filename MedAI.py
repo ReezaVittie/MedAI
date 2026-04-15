@@ -50,6 +50,56 @@ USERS_FILE     = os.path.join(_DATA_DIR, "users.json")
 MEDICAL_FILE   = os.path.join(_DATA_DIR, "medical_profiles.json")
 EMERGENCY_FILE = os.path.join(_DATA_DIR, "emergency_services.json")
 
+# ── MongoDB persistent storage (optional) ────────────────────────────────────
+# When MONGO_URI is set, ALL user accounts, conversations and medical profiles
+# are stored in MongoDB Atlas (free M0 tier) and survive every Render restart.
+# Without MONGO_URI the app falls back to /tmp JSON files — those ARE wiped on
+# restart, so accounts would be lost.  Set MONGO_URI in Render → Environment.
+#
+# How to get a free MongoDB URI (takes ~5 minutes):
+#   1. https://cloud.mongodb.com  → sign up free
+#   2. Create a free M0 cluster (any region)
+#   3. Database Access → Add database user (save username + password)
+#   4. Network Access → Add IP Address → Allow access from anywhere (0.0.0.0/0)
+#   5. Clusters → Connect → Drivers → copy the URI
+#      replace <password> with your password
+#   6. Paste URI as MONGO_URI in Render dashboard → medai → Environment
+
+_mongo_users_col = None   # pymongo Collection for user accounts
+_mongo_convs_col  = None  # pymongo Collection for conversations
+_mongo_medical_col = None # pymongo Collection for medical profiles
+_mongo_ready      = False
+
+def _init_mongo() -> None:
+    """Connect to MongoDB once; silently fall back to file storage on failure."""
+    global _mongo_users_col, _mongo_convs_col, _mongo_medical_col, _mongo_ready
+    if _mongo_ready:
+        return
+    _mongo_ready = True
+    uri = os.environ.get("MONGO_URI", "").strip()
+    if not uri:
+        print("[MedAI] MONGO_URI not set — using /tmp file storage "
+              "(accounts WILL be lost on every Render restart)")
+        return
+    try:
+        from pymongo import MongoClient
+        client = MongoClient(uri, serverSelectionTimeoutMS=6000)
+        client.admin.command("ping")           # fail fast if URI is wrong
+        db = client.get_database("medai")
+        _mongo_users_col   = db["users"]
+        _mongo_convs_col   = db["conversations"]
+        _mongo_medical_col = db["medical_profiles"]
+        # Ensure index so lookups by email are O(1)
+        _mongo_users_col.create_index("email", unique=True, background=True)
+        _mongo_convs_col.create_index("user_email", background=True)
+        _mongo_medical_col.create_index("email", unique=True, background=True)
+        print("[MedAI] MongoDB connected ✓ — data will persist across restarts")
+    except Exception as exc:
+        print(f"[MedAI] MongoDB unavailable ({exc}), falling back to /tmp file storage")
+
+# Initialise at import time so the first request isn't slowed down
+_init_mongo()
+
 # ── Pre-compiled regex patterns (avoids recompiling on every request) ─────────
 _RE_BOLD    = re.compile(r"\*\*(.+?)\*\*")
 _RE_ITALIC  = re.compile(r"\*(.+?)\*")
@@ -118,26 +168,48 @@ FORMATTING RULES:
 
 Always respect user autonomy and encourage professional care for anything serious, unclear, or persistent."""
 
-# ── In-memory conversation cache ──────────────────────────────────────────────
-# Loaded once from disk; all reads use the in-memory list directly.
-# Writes update the list then flush to disk.
+# ── Conversation storage ───────────────────────────────────────────────────────
+# MongoDB-first; falls back to in-memory + /tmp JSON file when not configured.
 
 _convs: list = []
 _loaded: bool = False
 
 
-def _ensure_loaded() -> None:
+def _ensure_loaded(user_email: str = "") -> None:
+    """Load conversations from MongoDB or file into the in-memory cache."""
     global _convs, _loaded
+    if _mongo_convs_col is not None:
+        # Always read fresh from MongoDB — no stale-cache risk across restarts
+        try:
+            docs = list(_mongo_convs_col.find(
+                {"user_email": user_email} if user_email else {},
+                {"_id": 0}
+            ).sort("created", -1))
+            _convs = docs
+            _loaded = True
+            return
+        except Exception as exc:
+            print(f"[MedAI] MongoDB _ensure_loaded error: {exc}")
+    # File fallback
     if not _loaded:
         if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                _convs = json.load(f)
+            try:
+                with open(DATA_FILE, "r", encoding="utf-8") as f:
+                    _convs = json.load(f)
+            except Exception:
+                _convs = []
         _loaded = True
 
 
 def _flush() -> None:
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(_convs, f, ensure_ascii=False, indent=2)
+    """Persist conversations. MongoDB is authoritative; file is backup."""
+    if _mongo_convs_col is not None:
+        return  # MongoDB writes happen inline in each route — nothing to batch
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(_convs, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[MedAI] Warning: could not save conversations file: {e}")
 
 # ── User management ──────────────────────────────────────────────────────────
 _users: dict = {}
@@ -146,6 +218,7 @@ _users_loaded: bool = False
 def _hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+# ── file-based fallbacks (used when MongoDB is not configured) ────────────────
 def _ensure_users_loaded() -> None:
     global _users, _users_loaded
     if not _users_loaded:
@@ -155,39 +228,73 @@ def _ensure_users_loaded() -> None:
         _users_loaded = True
 
 def _flush_users() -> None:
-    with open(USERS_FILE, "w", encoding="utf-8") as f:
-        json.dump(_users, f, ensure_ascii=False, indent=2)
+    try:
+        with open(USERS_FILE, "w", encoding="utf-8") as f:
+            json.dump(_users, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[MedAI] Warning: could not save users file: {e}")
 
+# ── public API (MongoDB-first, file fallback) ─────────────────────────────────
 def register_user(email: str, password: str) -> tuple[bool, str]:
-    _ensure_users_loaded()
     email = email.strip().lower()
-    
+
     if not email or not password:
         return False, "Email and password are required"
     if "@" not in email:
         return False, "Invalid email address"
     if len(password) < 6:
         return False, "Password must be at least 6 characters"
-    if email in _users:
-        return False, "Email already registered"
-    
-    _users[email] = {
-        "password": _hash_password(password),
-        "created": int(time.time() * 1000)
-    }
-    _flush_users()
-    return True, "Registration successful"
+
+    if _mongo_users_col is not None:
+        # ── MongoDB path ──────────────────────────────────────────────────
+        try:
+            if _mongo_users_col.find_one({"email": email}, {"_id": 1}):
+                return False, "Email already registered"
+            _mongo_users_col.insert_one({
+                "email":    email,
+                "password": _hash_password(password),
+                "created":  int(time.time() * 1000),
+            })
+            return True, "Registration successful"
+        except Exception as exc:
+            print(f"[MedAI] MongoDB register_user error: {exc}")
+            return False, "Registration failed — please try again"
+    else:
+        # ── File fallback ─────────────────────────────────────────────────
+        _ensure_users_loaded()
+        if email in _users:
+            return False, "Email already registered"
+        _users[email] = {
+            "password": _hash_password(password),
+            "created":  int(time.time() * 1000),
+        }
+        _flush_users()
+        return True, "Registration successful"
+
 
 def login_user(email: str, password: str) -> tuple[bool, str]:
-    _ensure_users_loaded()
     email = email.strip().lower()
-    
-    if email not in _users:
-        return False, "Email not registered"
-    if _users[email]["password"] != _hash_password(password):
-        return False, "Invalid password"
-    
-    return True, email
+
+    if _mongo_users_col is not None:
+        # ── MongoDB path ──────────────────────────────────────────────────
+        try:
+            doc = _mongo_users_col.find_one({"email": email})
+            if not doc:
+                return False, "Email not registered"
+            if doc["password"] != _hash_password(password):
+                return False, "Invalid password"
+            return True, email
+        except Exception as exc:
+            print(f"[MedAI] MongoDB login_user error: {exc}")
+            return False, "Login failed — please try again"
+    else:
+        # ── File fallback ─────────────────────────────────────────────────
+        _ensure_users_loaded()
+        if email not in _users:
+            return False, "Email not registered"
+        if _users[email]["password"] != _hash_password(password):
+            return False, "Invalid password"
+        return True, email
 
 # ── Emergency services management ─────────────────────────────────────────────
 _emergency_services: dict = {}
@@ -423,105 +530,91 @@ def _ensure_medical_loaded() -> None:
         _medical_loaded = True
 
 def _flush_medical() -> None:
-    """Save medical profiles to file"""
-    with open(MEDICAL_FILE, "w", encoding="utf-8") as f:
-        json.dump(_medical_profiles, f, ensure_ascii=False, indent=2)
+    """Save medical profiles to file (used only when MongoDB is not available)."""
+    try:
+        with open(MEDICAL_FILE, "w", encoding="utf-8") as f:
+            json.dump(_medical_profiles, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[MedAI] Warning: could not save medical file: {e}")
 
 def get_medical_profile(email: str) -> dict:
-    """Get user's medical profile with consent check"""
-    _ensure_medical_loaded()
+    """Return the medical profile for an email address, or {} if none exists."""
     email = email.strip().lower()
+    if _mongo_medical_col is not None:
+        try:
+            doc = _mongo_medical_col.find_one({"email": email}, {"_id": 0, "email": 0})
+            return doc or {}
+        except Exception as exc:
+            print(f"[MedAI] get_medical_profile MongoDB error: {exc}")
+    # file fallback
+    _ensure_medical_loaded()
     return _medical_profiles.get(email, {})
 
 def update_medical_profile(email: str, profile_data: dict) -> tuple[bool, str]:
-    """Update user's medical profile with error handling"""
+    """Save (upsert) a medical profile. Requires consent_given == True."""
     try:
-        _ensure_medical_loaded()
         email = email.strip().lower()
-        
         if not email:
             return False, "Invalid email address"
-        
-        # Validate medical data structure
+
         valid_fields = {
-            'allergies', 'chronic_conditions', 'medications', 'deficiencies', 
+            'allergies', 'chronic_conditions', 'medications', 'deficiencies',
             'emergency_contacts', 'blood_type', 'insurance_info', 'consent_given'
         }
-        
-        # Only allow valid fields and require explicit consent
         if not profile_data.get('consent_given', False):
             return False, "Medical data consent is required"
-        
-        # Create backup of existing profile before updating
-        existing_profile = _medical_profiles.get(email, {}).copy()
-        
-        filtered_data = {k: v for k, v in profile_data.items() if k in valid_fields}
-        current_time = int(time.time() * 1000)
-        filtered_data['updated'] = current_time
-        filtered_data['last_modified'] = datetime.now().isoformat()
-        
-        # Set creation date if this is a new profile
-        if not existing_profile:
-            filtered_data['created'] = current_time
-        
-        _medical_profiles[email] = filtered_data
-        
-        # Attempt to save to file
-        _flush_medical()
-        
-        # Verify the save was successful by re-reading
+
+        filtered = {k: v for k, v in profile_data.items() if k in valid_fields}
+        now = int(time.time() * 1000)
+        filtered['updated'] = now
+        filtered['last_modified'] = datetime.now().isoformat()
+
+        if _mongo_medical_col is not None:
+            # upsert — creates if missing, updates if exists
+            existing = _mongo_medical_col.find_one({"email": email}, {"created": 1})
+            if not existing:
+                filtered['created'] = now
+            _mongo_medical_col.update_one(
+                {"email": email},
+                {"$set": {**filtered, "email": email}},
+                upsert=True,
+            )
+            return True, "Medical profile saved successfully"
+
+        # file fallback
         _ensure_medical_loaded()
         if email not in _medical_profiles:
-            # Restore backup if save failed
-            if existing_profile:
-                _medical_profiles[email] = existing_profile
-                _flush_medical()
-            return False, "Failed to save medical profile - data integrity check failed"
-        
+            filtered['created'] = now
+        _medical_profiles[email] = filtered
+        _flush_medical()
         return True, "Medical profile saved successfully"
-        
-    except Exception as e:
-        # Attempt to restore backup on any error
-        try:
-            if existing_profile:
-                _medical_profiles[email] = existing_profile
-                _flush_medical()
-        except:
-            pass  # If backup restore fails, we can't do much
-        return False, f"Error saving medical profile: {str(e)}"
+
+    except Exception as exc:
+        return False, f"Error saving medical profile: {str(exc)}"
 
 def delete_medical_profile(email: str) -> tuple[bool, str]:
-    """Delete user's medical profile with safeguards"""
+    """Permanently delete the medical profile for an email address."""
     try:
-        _ensure_medical_loaded()
         email = email.strip().lower()
-        
         if not email:
             return False, "Invalid email address"
-        
+
+        if _mongo_medical_col is not None:
+            result = _mongo_medical_col.delete_one({"email": email})
+            if result.deleted_count == 0:
+                return False, "Medical profile not found"
+            return True, "Medical profile deleted successfully"
+
+        # file fallback
+        _ensure_medical_loaded()
         if email not in _medical_profiles:
             return False, "Medical profile not found"
-        
-        # Create backup before deletion (in case of accidental deletion)
-        deleted_profile = _medical_profiles[email].copy()
-        deleted_profile['deleted_at'] = datetime.now().isoformat()
-        deleted_profile['deleted_by'] = email
-        
-        # Remove from active profiles
         del _medical_profiles[email]
-        
-        # Save the changes
         _flush_medical()
-        
-        # Verify deletion was successful
-        _ensure_medical_loaded()
-        if email in _medical_profiles:
-            return False, "Failed to delete medical profile - deletion verification failed"
-        
         return True, "Medical profile deleted successfully"
-        
-    except Exception as e:
-        return False, f"Error deleting medical profile: {str(e)}"
+
+    except Exception as exc:
+        return False, f"Error deleting medical profile: {str(exc)}"
 
 # ── Flask app ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
@@ -2910,29 +3003,57 @@ def _require_login(f):
 @app.route("/api/conversations", methods=["GET"])
 @_require_login
 def get_conversations():
-    _ensure_loaded()
+    user_email = session.get("user_email", "")
+    if _mongo_convs_col is not None:
+        try:
+            docs = list(_mongo_convs_col.find(
+                {"user_email": user_email}, {"_id": 0}
+            ).sort("created", -1))
+            return jsonify(docs)
+        except Exception as exc:
+            print(f"[MedAI] get_conversations MongoDB error: {exc}")
+    # file fallback
+    _ensure_loaded(user_email)
     return jsonify(_convs)
 
 
 @app.route("/api/conversations", methods=["POST"])
 @_require_login
 def new_conversation():
-    _ensure_loaded()
+    user_email = session.get("user_email", "")
     conv = {
-        "id": "conv_" + uuid.uuid4().hex,
-        "title": "New Consultation",
-        "messages": [],
-        "created": int(time.time() * 1000),
+        "id":         "conv_" + uuid.uuid4().hex,
+        "user_email": user_email,
+        "title":      "New Consultation",
+        "messages":   [],
+        "created":    int(time.time() * 1000),
     }
-    _convs.insert(0, conv)
-    _flush()
+    if _mongo_convs_col is not None:
+        try:
+            _mongo_convs_col.insert_one({**conv, "_id": conv["id"]})
+        except Exception as exc:
+            print(f"[MedAI] new_conversation MongoDB error: {exc}")
+    else:
+        _ensure_loaded(user_email)
+        _convs.insert(0, conv)
+        _flush()
+    # strip _id before sending to client
+    conv.pop("_id", None)
     return jsonify(conv), 201
 
 
 @app.route("/api/conversations/<conv_id>", methods=["DELETE"])
 @_require_login
 def delete_conversation(conv_id):
-    _ensure_loaded()
+    user_email = session.get("user_email", "")
+    if _mongo_convs_col is not None:
+        try:
+            _mongo_convs_col.delete_one({"id": conv_id, "user_email": user_email})
+            return jsonify({"ok": True})
+        except Exception as exc:
+            print(f"[MedAI] delete_conversation MongoDB error: {exc}")
+    # file fallback
+    _ensure_loaded(user_email)
     _convs[:] = [c for c in _convs if c["id"] != conv_id]
     _flush()
     return jsonify({"ok": True})
@@ -2941,25 +3062,50 @@ def delete_conversation(conv_id):
 @app.route("/api/conversations/<conv_id>", methods=["PATCH"])
 @_require_login
 def rename_conversation(conv_id):
+    user_email = session.get("user_email", "")
     body = request.get_json(force=True)
     title = body.get("title", "").strip()
     if not title:
         return jsonify({"error": "Title is required"}), 400
 
-    _ensure_loaded()
+    if _mongo_convs_col is not None:
+        try:
+            result = _mongo_convs_col.update_one(
+                {"id": conv_id, "user_email": user_email},
+                {"$set": {"title": title}}
+            )
+            if result.matched_count:
+                return jsonify({"ok": True, "id": conv_id, "title": title})
+            return jsonify({"error": "Conversation not found"}), 404
+        except Exception as exc:
+            print(f"[MedAI] rename_conversation MongoDB error: {exc}")
+
+    # file fallback
+    _ensure_loaded(user_email)
     for c in _convs:
         if c["id"] == conv_id:
             c["title"] = title
             _flush()
             return jsonify({"ok": True, "id": conv_id, "title": title})
-
     return jsonify({"error": "Conversation not found"}), 404
 
 
 @app.route("/api/conversations/<conv_id>/clear", methods=["POST"])
 @_require_login
 def clear_conversation(conv_id):
-    _ensure_loaded()
+    user_email = session.get("user_email", "")
+    if _mongo_convs_col is not None:
+        try:
+            _mongo_convs_col.update_one(
+                {"id": conv_id, "user_email": user_email},
+                {"$set": {"messages": [], "title": "New Consultation"}}
+            )
+            return jsonify({"ok": True})
+        except Exception as exc:
+            print(f"[MedAI] clear_conversation MongoDB error: {exc}")
+
+    # file fallback
+    _ensure_loaded(user_email)
     for c in _convs:
         if c["id"] == conv_id:
             c["messages"] = []
@@ -3079,13 +3225,23 @@ def chat():
         if not user_text:
             return jsonify({"error": "Empty message"}), 400
 
-        _ensure_loaded()
-        conv = next((c for c in _convs if c["id"] == conv_id), None)
+        user_email = session.get("user_email", "")
+        # Load conversation — MongoDB first, then in-memory cache
+        conv = None
+        if _mongo_convs_col is not None:
+            try:
+                conv = _mongo_convs_col.find_one(
+                    {"id": conv_id, "user_email": user_email}, {"_id": 0}
+                )
+            except Exception as exc:
+                print(f"[MedAI] chat load conv MongoDB error: {exc}")
+        if conv is None:
+            _ensure_loaded(user_email)
+            conv = next((c for c in _convs if c["id"] == conv_id), None)
         if conv is None:
             return jsonify({"error": "Conversation not found"}), 404
 
         # Build API history from existing messages
-        user_email = session.get("user_email")
         medical_context = ""
         try:
             if user_email:
@@ -3178,7 +3334,17 @@ def chat():
             })
 
             try:
-                _flush()
+                if _mongo_convs_col is not None:
+                    _mongo_convs_col.update_one(
+                        {"id": conv["id"]},
+                        {"$set": {
+                            "messages": conv["messages"],
+                            "title":    conv["title"],
+                        }},
+                        upsert=True,
+                    )
+                else:
+                    _flush()
             except Exception as flush_err:
                 print(f"[MedAI] Warning: could not save conversation: {flush_err}")
 
