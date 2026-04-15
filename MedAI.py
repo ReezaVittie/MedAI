@@ -864,14 +864,107 @@ html, body {
 .input-warn { font-size: 11px; color: var(--amber); opacity: .7; }
 
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 40; }
-@media(max-width:700px) {
-  :root { --sidebar-w: 82vw; }
-  .sidebar { position: fixed; top:0; left:0; height:100%; }
-  .sidebar.collapsed { transform: translateX(-100%); width: var(--sidebar-w); min-width: var(--sidebar-w); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE  (≤ 700 px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 700px) {
+  /* iOS viewport fix – prevents content hiding under browser chrome */
+  html { height: -webkit-fill-available; }
+  body { min-height: -webkit-fill-available; }
+  .app { min-height: -webkit-fill-available; }
+
+  :root { --sidebar-w: 86vw; }
+
+  /* ── Sidebar becomes a slide-in drawer ── */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    height: 100%; height: -webkit-fill-available;
+    z-index: 50;
+    box-shadow: 4px 0 32px rgba(0,0,0,.55);
+  }
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+  }
   .overlay.show { display: block; }
-  .starter-grid { grid-template-columns: 1fr 1fr; }
-  .msgs-wrap { padding: 20px 14px 0; }
-  .input-zone { padding: 10px 14px 18px; }
+
+  /* ── Topbar ── */
+  .topbar { padding: 0 10px; gap: 8px; }
+  .online-badge { display: none; }          /* hides "AI Online" badge to save space */
+  .topbar-title { font-size: 13px; }
+  .toggle-btn { width: 44px; height: 44px; } /* 44px touch target */
+  .icon-btn    { width: 44px; height: 44px; }
+
+  /* ── Chat messages ── */
+  .msgs-wrap { padding: 16px 12px 0; }
+  .chat-area { -webkit-overflow-scrolling: touch; }
+  .msg-av { width: 30px; height: 30px; border-radius: 8px; font-size: 11px; }
+  .bubble { padding: 11px 13px; font-size: 14px; }
+  .msg-row { gap: 8px; margin-bottom: 20px; }
+
+  /* ── Welcome / starter cards ── */
+  .welcome { padding: 32px 0 24px; }
+  .orb-wrap { width: 68px; height: 68px; margin-bottom: 18px; }
+  .orb-core { width: 52px; height: 52px; }
+  .welcome-h { font-size: 24px; }
+  .welcome-p { font-size: 13px; max-width: 100%; margin-bottom: 28px; }
+  .starter-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .starter { padding: 12px 10px; }
+  .s-lbl { font-size: 12px; }
+
+  /* ── Input zone ── */
+  .input-zone {
+    padding: 8px 12px 16px;
+    /* push above home-indicator on notched iPhones */
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+  }
+  /* Prevent iOS auto-zoom (triggered when font-size < 16px) */
+  .chat-ta { font-size: 16px !important; }
+  .send-btn { width: 44px; height: 44px; }          /* 44px touch target */
+  .input-foot { margin-top: 6px; padding-top: 6px; }
+  /* Replace keyboard-shortcut hint with mobile hint */
+  .input-hint .desktop-hint { display: none; }
+  .input-hint .mobile-hint  { display: inline; }
+
+  /* ── Follow-up buttons ── */
+  .follow-up-btn { padding: 12px 14px; font-size: 14px; min-height: 44px; }
+
+  /* ── Symptom card ── */
+  .symptom-card { margin-top: 16px; padding: 14px; }
+  .body-silhouette { width: 220px; height: 330px; }
+  .body-part.head   { width: 60px; height: 60px; }
+  .body-part.chest  { width: 86px; height: 74px; }
+  .body-part.abdomen{ width: 74px; height: 86px; }
+  .scroll-sidebar { display: none; }
+
+  /* ── Modals → bottom sheet ── */
+  .modal-overlay { align-items: flex-end; }
+  .modal-content {
+    width: 100%; max-width: 100%;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    max-height: 88vh;
+    /* clear home-indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .modal-header { padding: 16px 18px; }
+  .modal-header h3 { font-size: 16px; }
+  .modal-close { width: 40px; height: 40px; font-size: 22px; }
+  .modal-body { padding: 16px 18px; }
+  .modal-footer { padding: 12px 18px; }
+
+  /* ── Auth page ── */
+  .auth-container { padding: 0 4px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SMALL PHONES  (≤ 400 px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .starter-grid { grid-template-columns: 1fr; }
+  .welcome-h { font-size: 21px; }
+  .topbar-actions { gap: 2px; }
+  .icon-btn { width: 40px; height: 40px; }
 }
 </style>
 </head>
@@ -1050,7 +1143,7 @@ html, body {
           </button>
         </div>
         <div class="input-foot">
-          <span class="input-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span>
+          <span class="input-hint"><span class="desktop-hint">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</span><span class="mobile-hint" style="display:none">Tap the send button to send</span></span>
           <span class="input-warn">⚠️ Always see a doctor for serious symptoms</span>
         </div>
       </div>
@@ -1436,6 +1529,12 @@ function loadConversation(id) {
   document.getElementById('topTitle').textContent = conv.title;
   renderMessages(conv.messages);
   markActive(id);
+  // On mobile, close the sidebar so the chat is fully visible
+  if (window.innerWidth <= 700) {
+    sidebarOpen = false;
+    document.getElementById('sidebar').classList.add('collapsed');
+    document.getElementById('overlay').classList.remove('show');
+  }
 }
 
 async function deleteConversation(id, e) {
@@ -2503,17 +2602,42 @@ async function deleteMedicalProfile() {
   color: #fca5a5;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* ── Responsive adjustments ── */
+@media (max-width: 700px) {
+  /* Modal → bottom sheet */
+  .modal-overlay { align-items: flex-end; }
+  .modal-content {
+    width: 100%; max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 88vh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .modal-header { padding: 16px 18px; }
+  .modal-header h3 { font-size: 16px; }
+  .modal-close { width: 44px; height: 44px; font-size: 22px; }
+  .modal-body { padding: 16px 18px; }
+  .modal-footer { padding: 12px 18px; flex-wrap: wrap; gap: 8px; }
+  .modal-footer button { flex: 1; min-width: 120px; min-height: 44px; }
+
+  /* Emergency numbers */
   .emergency-number {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
-  .number-value {
-    font-size: 18px;
-  }
+  .number-value { font-size: 18px; }
+
+  /* Emergency call button - full height touch target */
+  .emergency-call-btn { min-height: 52px; font-size: 15px; }
+
+  /* Form fields - prevent iOS zoom */
+  .form-group input,
+  .form-group select,
+  .form-group textarea { font-size: 16px !important; }
+
+  /* Consent checkbox - bigger tap area */
+  .consent-label { gap: 14px; }
+  .consent-label input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; }
 }
 </style>
 
@@ -2563,6 +2687,14 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
     .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; }
     .auth-footer a { color: var(--accent); text-decoration: none; }
     .auth-footer a:hover { text-decoration: underline; }
+    @media (max-width: 700px) {
+      body { padding: 16px; align-items: flex-start; padding-top: max(40px, env(safe-area-inset-top, 40px)); }
+      .auth-container { max-width: 100%; }
+      .auth-header { margin-bottom: 28px; }
+      /* Prevent iOS zoom on input focus */
+      .form-input { font-size: 16px !important; min-height: 48px; }
+      .form-submit { min-height: 48px; font-size: 15px; }
+    }
   </style>
 </head>
 <body>
