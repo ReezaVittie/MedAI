@@ -40,7 +40,7 @@ if os.path.exists(_env_path):
 # ── Config ───────────────────────────────────────────────────────────────────
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY", "")
 if not COHERE_API_KEY:
-    raise ValueError("COHERE_API_KEY environment variable is not set. Add it in your Render dashboard.")
+    print("[MedAI] WARNING: COHERE_API_KEY is not set. Chat will return errors until it is configured.")
 COHERE_MODEL   = "command-a-03-2025"
 COHERE_URL     = "https://api.cohere.com/v2/chat"
 # Use /tmp on Render (read-only filesystem) and local dir in dev
