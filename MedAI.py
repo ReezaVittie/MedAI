@@ -375,7 +375,9 @@ def get_available_cities(country: str, region: str) -> list:
     _ensure_emergency_loaded()
     return list(_emergency_services.get(country, {}).get(region, {}).keys())
 
-# ── Flask app ─────────────────────────────────────────────────────────────────
+# ── Medical profile management ────────────────────────────────────────────────
+_medical_profiles: dict = {}
+_medical_loaded: bool = False
 
 def _ensure_medical_loaded() -> None:
     """Load medical profiles with validation and error recovery"""
