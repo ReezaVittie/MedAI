@@ -34,12 +34,16 @@ if os.path.exists(_env_path):
 
 # ── Config ───────────────────────────────────────────────────────────────────
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY", "")
+if not COHERE_API_KEY:
+    raise ValueError("COHERE_API_KEY environment variable is not set. Add it in your Render dashboard.")
 COHERE_MODEL   = "command-a-03-2025"
 COHERE_URL     = "https://api.cohere.com/v2/chat"
-DATA_FILE      = os.path.join(os.path.dirname(__file__), "conversations.json")
-USERS_FILE     = os.path.join(os.path.dirname(__file__), "users.json")
-MEDICAL_FILE   = os.path.join(os.path.dirname(__file__), "medical_profiles.json")
-EMERGENCY_FILE = os.path.join(os.path.dirname(__file__), "emergency_services.json")
+# Use /tmp on Render (read-only filesystem) and local dir in dev
+_DATA_DIR      = "/tmp" if os.environ.get("FLASK_ENV") == "production" else os.path.dirname(__file__)
+DATA_FILE      = os.path.join(_DATA_DIR, "conversations.json")
+USERS_FILE     = os.path.join(_DATA_DIR, "users.json")
+MEDICAL_FILE   = os.path.join(_DATA_DIR, "medical_profiles.json")
+EMERGENCY_FILE = os.path.join(_DATA_DIR, "emergency_services.json")
 
 # ── Pre-compiled regex patterns (avoids recompiling on every request) ─────────
 _RE_BOLD    = re.compile(r"\*\*(.+?)\*\*")
@@ -194,6 +198,7 @@ def _ensure_emergency_loaded() -> None:
                 _emergency_services = json.load(f)
         else:
             # Initialize with default emergency services data
+            # Keep default data in memory — do NOT write to disk on first load
             _emergency_services = {
                 "South Africa": {
                     "Western Cape": {
@@ -327,7 +332,6 @@ def _ensure_emergency_loaded() -> None:
                     }
                 }
             }
-            _flush_emergency()
         _emergency_loaded = True
 
 def _flush_emergency() -> None:
@@ -413,35 +417,9 @@ def _ensure_medical_loaded() -> None:
         _medical_loaded = True
 
 def _flush_medical() -> None:
-    """Save medical profiles to file with backup and validation"""
-    try:
-        # Create backup of existing file before writing
-        backup_file = MEDICAL_FILE + '.backup'
-        if os.path.exists(MEDICAL_FILE):
-            import shutil
-            shutil.copy2(MEDICAL_FILE, backup_file)
-        
-        # Write new data
-        with open(MEDICAL_FILE, "w", encoding="utf-8") as f:
-            json.dump(_medical_profiles, f, ensure_ascii=False, indent=2)
-        
-        # Validate the written file
-        with open(MEDICAL_FILE, "r", encoding="utf-8") as f:
-            test_load = json.load(f)
-        
-        # If validation passes, remove backup
-        if os.path.exists(backup_file):
-            os.remove(backup_file)
-            
-    except Exception as e:
-        # If writing failed, try to restore from backup
-        if os.path.exists(backup_file):
-            try:
-                shutil.copy2(backup_file, MEDICAL_FILE)
-                print(f"Restored medical profiles from backup due to error: {e}")
-            except:
-                print(f"Failed to restore backup: {e}")
-        raise e
+    """Save medical profiles to file"""
+    with open(MEDICAL_FILE, "w", encoding="utf-8") as f:
+        json.dump(_medical_profiles, f, ensure_ascii=False, indent=2)
 
 def get_medical_profile(email: str) -> dict:
     """Get user's medical profile with consent check"""
