@@ -54,8 +54,7 @@ _RE_H2      = re.compile(r"^## (.+)$",  re.MULTILINE)
 _RE_URGENT  = re.compile(r"\[URGENT:\s*(.+?)\]")
 _RE_WARNING = re.compile(r"\[WARNING:\s*(.+?)\]")
 _RE_BULLET  = re.compile(r"^[-•]\s+(.+)$", re.MULTILINE)
-_RE_UL_WRAP = re.compile(r"(<li>[\s\S]*?</li>)")
-_RE_UL_COLL = re.compile(r"</ul>\s*<ul>")
+# _RE_UL_WRAP removed — (<li>[\s\S]*?</li>) caused RecursionError on long responses
 _RE_NUMLIST = re.compile(r"^\d+\.\s+(.+)$", re.MULTILINE)
 _RE_TAGS    = re.compile(r"<[^>]+>")
 
@@ -2989,10 +2988,30 @@ def format_reply(text: str) -> str:
     h = _RE_H2.sub(r"<h3>\1</h3>", h)
     h = _RE_URGENT.sub(r'<div class="urgent-block">🚨 <span>\1</span></div>', h)
     h = _RE_WARNING.sub(r'<div class="warn-block">⚠️ <span>\1</span></div>', h)
+
+    # Convert bullet/numbered markers to <li> tags
     h = _RE_BULLET.sub(r"<li>\1</li>", h)
-    h = _RE_UL_WRAP.sub(r"<ul>\1</ul>", h)
-    h = _RE_UL_COLL.sub("", h)
     h = _RE_NUMLIST.sub(r"<li>\1</li>", h)
+
+    # Wrap consecutive <li> lines in a single <ul> — line-by-line loop avoids
+    # the RecursionError that (<li>[\s\S]*?</li>) caused on long responses
+    lines = h.splitlines()
+    wrapped: list[str] = []
+    in_list = False
+    for line in lines:
+        if line.strip().startswith("<li>"):
+            if not in_list:
+                wrapped.append("<ul>")
+                in_list = True
+            wrapped.append(line)
+        else:
+            if in_list:
+                wrapped.append("</ul>")
+                in_list = False
+            wrapped.append(line)
+    if in_list:
+        wrapped.append("</ul>")
+    h = "\n".join(wrapped)
 
     result = []
     for p in re.split(r"\n\n+", h):
