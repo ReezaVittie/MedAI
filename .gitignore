@@ -1,0 +1,13 @@
+# Secret keys — NEVER commit these
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Local data files (contain user conversation data)
+conversations.json
+emergency_services.json
+medical_profiles.json
+users.json
