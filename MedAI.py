@@ -541,9 +541,9 @@ def delete_medical_profile(email: str) -> tuple[bool, str]:
 
 # ── Flask app ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
-app.secret_key = "medical-ai-secret-" + uuid.uuid4().hex
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-fallback-" + uuid.uuid4().hex)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get("FLASK_ENV") == "production"
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
