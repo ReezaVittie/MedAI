@@ -2967,7 +2967,14 @@ def chat():
             except Exception as flush_err:
                 print(f"[MedAI] Warning: could not save conversation: {flush_err}")
 
-            yield f'data: {json.dumps({"done": True, "conv": conv})}\n\n'
+            # ── Generate follow-up questions (non-fatal) ──────────────────────
+            follow_up: list[str] = []
+            try:
+                follow_up = _generate_follow_up(user_text, raw_reply)
+            except Exception as fu_err:
+                print(f"[MedAI] Follow-up generation skipped: {fu_err}")
+
+            yield f'data: {json.dumps({"done": True, "conv": conv, "follow_up": follow_up})}\n\n'
 
         except Exception as exc:
             yield f'data: {json.dumps({"error": f"Failed to save response: {str(exc)}"}  )}\n\n'
@@ -2979,6 +2986,59 @@ def chat():
     )
 
 
+
+
+# ── Follow-up question generator ─────────────────────────────────────────────
+
+def _generate_follow_up(user_msg: str, assistant_reply: str) -> list[str]:
+    """
+    Ask Cohere to suggest 3 follow-up questions.
+    Returns a list of up to 3 strings, or [] on any failure.
+    This is always called AFTER the main streaming response, so any delay
+    only affects the 'done' event, never the visible text stream.
+    """
+    try:
+        prompt = (
+            "Based on this medical conversation exchange, suggest exactly 3 short follow-up "
+            "questions the user might want to ask next. Return ONLY a JSON array of 3 strings — "
+            "no explanation, no numbering, no extra text.\n"
+            "Example output: [\"What are the side effects?\", \"Is this safe for children?\", \"When should I see a doctor?\"]\n\n"
+            f"User asked: {user_msg[:400]}\n"
+            f"Assistant replied: {assistant_reply[:600]}"
+        )
+        resp = _http.post(
+            COHERE_URL,
+            json={
+                "model": COHERE_MODEL,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You output only valid JSON arrays of strings. No markdown fences, no explanation.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                "stream": False,
+            },
+            timeout=20,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        # Cohere v2 non-streaming response shape:
+        # { "message": { "content": [ { "type": "text", "text": "..." } ] } }
+        text = (
+            data.get("message", {})
+                .get("content", [{}])[0]
+                .get("text", "")
+        )
+        # Extract the JSON array even if model wraps it in extra text
+        match = re.search(r"\[.*?\]", text, re.DOTALL)
+        if match:
+            questions = json.loads(match.group())
+            if isinstance(questions, list):
+                return [str(q).strip() for q in questions[:3] if str(q).strip()]
+    except Exception as exc:
+        print(f"[MedAI] _generate_follow_up failed (non-fatal): {exc}")
+    return []
 
 
 # ── Markdown-like → HTML formatter (uses pre-compiled patterns) ───────────────
