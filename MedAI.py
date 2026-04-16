@@ -2964,6 +2964,7 @@ def signup():
                 message_type = "success"
                 # Auto-login after successful registration
                 session["user_email"] = email
+                session.pop("is_guest", None)
                 return redirect(url_for("index"))
             else:
                 message = msg
@@ -2992,6 +2993,7 @@ def signin():
         success, result = login_user(email, password)
         if success:
             session["user_email"] = result
+            session.pop("is_guest", None)
             return redirect(url_for("index"))
         else:
             message = result
