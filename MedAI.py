@@ -2863,6 +2863,10 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
     .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; }
     .auth-footer a { color: var(--accent); text-decoration: none; }
     .auth-footer a:hover { text-decoration: underline; }
+    .storage-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 20px; padding: 7px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+    .storage-badge.ok  { background: rgba(34,197,94,0.1);  color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+    .storage-badge.warn{ background: rgba(245,166,35,0.1); color: #f5a623; border: 1px solid rgba(245,166,35,0.25); }
+    .storage-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
     @media (max-width: 700px) {
       body { padding: 16px; align-items: flex-start; padding-top: max(40px, env(safe-area-inset-top, 40px)); }
       .auth-container { max-width: 100%; }
@@ -2904,6 +2908,13 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
         Already have an account? <a href="/signin">Sign In</a>
       {% else %}
         Don't have an account? <a href="/signup">Sign Up</a>
+      {% endif %}
+    </div>
+    <div style="text-align:center">
+      {% if db_connected %}
+        <div class="storage-badge ok"><span class="storage-dot"></span>Accounts saved permanently</div>
+      {% else %}
+        <div class="storage-badge warn"><span class="storage-dot"></span>⚠️ Accounts not saved — database not connected</div>
       {% endif %}
     </div>
   </div>
@@ -2952,7 +2963,8 @@ def signup():
         page_subtitle="Create your MedAI account",
         button_text="Sign Up",
         message=message,
-        message_type=message_type
+        message_type=message_type,
+        db_connected=(_mongo_users_col is not None),
     )
 
 
@@ -2960,11 +2972,11 @@ def signup():
 def signin():
     message = ""
     message_type = ""
-    
+
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
-        
+
         success, result = login_user(email, password)
         if success:
             session["user_email"] = result
@@ -2972,7 +2984,7 @@ def signin():
         else:
             message = result
             message_type = "error"
-    
+
     return render_template_string(
         AUTH_TEMPLATE,
         is_signup=False,
@@ -2980,7 +2992,8 @@ def signin():
         page_subtitle="Welcome back to MedAI",
         button_text="Sign In",
         message=message,
-        message_type=message_type
+        message_type=message_type,
+        db_connected=(_mongo_users_col is not None),
     )
 
 
