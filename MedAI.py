@@ -828,6 +828,9 @@ html, body {
 .topbar-actions { display: flex; gap: 6px; }
 .icon-btn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--border-faint); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .icon-btn:hover { background: var(--navy-800); color: var(--text-primary); border-color: var(--border-subtle); }
+.guest-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--amber); background: var(--amber-dim); border: 1px solid rgba(245,166,35,.2); border-radius: 20px; padding: 3px 10px; flex-shrink: 0; white-space: nowrap; }
+.guest-badge a { color: var(--amber); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.guest-badge a:hover { color: #ffd080; }
 
 .chat-area { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
 .chat-area::-webkit-scrollbar { width: 4px; }
@@ -1022,6 +1025,7 @@ html, body {
   /* ── Topbar ── */
   .topbar { padding: 0 10px; gap: 8px; }
   .online-badge { display: none; }          /* hides "AI Online" badge to save space */
+  .guest-badge  { display: none; }          /* hides guest badge on mobile to prevent overflow */
   .topbar-title { font-size: 13px; }
   .toggle-btn { width: 44px; height: 44px; } /* 44px touch target */
   .icon-btn    { width: 44px; height: 44px; }
@@ -1152,6 +1156,9 @@ html, body {
         <span class="topbar-title" id="topTitle">New Consultation</span>
         <div class="online-badge"><span class="online-dot"></span>AI Online</div>
       </div>
+      {% if is_guest %}
+        <div class="guest-badge">Guest &mdash; <a href="/signup">Sign up to save</a></div>
+      {% endif %}
       <div class="topbar-actions">
         <button class="icon-btn" title="Clear chat" onclick="clearChat()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
@@ -2863,6 +2870,9 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
     .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; }
     .auth-footer a { color: var(--accent); text-decoration: none; }
     .auth-footer a:hover { text-decoration: underline; }
+    .skip-btn { position: fixed; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); font-size: 20px; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all .2s; line-height: 1; }
+    .skip-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
+    .skip-btn title-attr::after { content: 'Continue as guest'; }
     @media (max-width: 700px) {
       body { padding: 16px; align-items: flex-start; padding-top: max(40px, env(safe-area-inset-top, 40px)); }
       .auth-container { max-width: 100%; }
@@ -2874,6 +2884,9 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
   </style>
 </head>
 <body>
+  <!-- X / skip button — top right corner -->
+  <a href="/guest" class="skip-btn" title="Continue as guest">&#x2715;</a>
+
   <div class="auth-container">
     <div class="auth-header">
       <div class="auth-logo">MedAI</div>
@@ -2917,7 +2930,18 @@ AUTH_TEMPLATE = r"""<!DOCTYPE html>
 def index():
     if "user_email" not in session:
         return redirect(url_for("signin"))
-    return render_template_string(HTML_TEMPLATE)
+    return render_template_string(
+        HTML_TEMPLATE,
+        is_guest=session.get("is_guest", False)
+    )
+
+
+@app.route("/guest")
+def guest():
+    """Skip sign-in — creates a temporary guest session."""
+    session["user_email"] = "guest_" + uuid.uuid4().hex
+    session["is_guest"] = True
+    return redirect(url_for("index"))
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -2991,7 +3015,7 @@ def signout():
 
 
 def _require_login(f):
-    """Decorator to require user login for API endpoints"""
+    """Decorator — allows both registered users and guests (is_guest=True)."""
     def wrapper(*args, **kwargs):
         if "user_email" not in session:
             return jsonify({"error": "Unauthorized"}), 401
