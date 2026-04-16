@@ -895,57 +895,24 @@ html, body {
 .follow-up-btn:disabled { cursor: not-allowed; opacity: 0.6; }
 .follow-up-btn:last-child { margin-bottom: 0; }
 
-/* Symptom Map */
-.symptom-card { margin: 0 auto 20px; padding: 20px; border: 1px solid var(--border-faint); border-radius: var(--r-lg); background: rgba(15,35,64,.88); max-width: 840px; }
-.symptom-card h3 { margin-bottom: 10px; font-size: 15px; color: var(--text-primary); }
-.symptom-card p { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
-.symptom-map { display: grid; place-items: center; margin: 0 auto 12px; width: 100%; max-width: 300px; position: relative; }
-.body-silhouette { width: 300px; height: 560px; background: linear-gradient(180deg, rgba(8,24,44,.98) 0%, rgba(16,38,72,.96) 50%, rgba(26,58,105,.92) 100%); border: 1px dashed rgba(255,255,255,.12); border-radius: 40px; position: relative; overflow: hidden; }
-.body-silhouette::before { content: ''; position: absolute; top: 96px; left: 50%; transform: translateX(-50%); width: 2px; height: 344px; background: rgba(255,255,255,.08); }
-.body-silhouette::after { content: ''; position: absolute; top: 276px; left: 16px; width: 268px; height: 1px; background: rgba(255,255,255,.08); opacity: .35; }
-.body-part { position: absolute; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: transparent; cursor: pointer; transition: all .2s; }
-.body-part:hover, .body-part:focus { background: rgba(47,158,255,.28); border-color: rgba(47,158,255,.65); outline: none; color: var(--text-primary); }
-.body-part::after { content: attr(data-region); position: absolute; left: 50%; top: 100%; transform: translate(-50%, 8px); white-space: nowrap; opacity: 0; pointer-events: none; font-size: 11px; color: var(--text-primary); background: rgba(7,20,38,.92); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; padding: 4px 8px; transition: opacity .2s; }
-.body-part:hover::after, .body-part:focus::after { opacity: 1; }
-.body-part.active { background: rgba(47,158,255,.40); border-color: rgba(47,158,255,.75); }
-.body-part.head { top: 18px; left: 50%; width: 60px; height: 62px; transform: translateX(-50%); border-radius: 50%; }
-.body-part.left-eye { top: 28px; left: 135px; width: 8px; height: 8px; border-radius: 50%; }
-.body-part.right-eye { top: 28px; left: 157px; width: 8px; height: 8px; border-radius: 50%; }
-.body-part.nose { top: 38px; left: 145px; width: 10px; height: 10px; border-radius: 50%; }
-.body-part.left-ear { top: 33px; left: 110px; width: 8px; height: 12px; border-radius: 4px; }
-.body-part.right-ear { top: 33px; left: 182px; width: 8px; height: 12px; border-radius: 4px; }
-.body-part.mouth { top: 58px; left: 144px; width: 12px; height: 6px; border-radius: 3px; }
-.body-part.neck { top: 82px; left: 50%; width: 18px; height: 26px; transform: translateX(-50%); border-radius: 12px; }
-.body-part.left-shoulder, .body-part.right-shoulder { top: 100px; width: 34px; height: 28px; border-radius: 20px 20px 14px 14px; }
-.body-part.left-shoulder { left: 24px; }
-.body-part.right-shoulder { right: 24px; }
-.body-part.chest { top: 118px; left: 50%; width: 84px; height: 72px; transform: translateX(-50%); border-radius: 42px; }
-.body-part.upper-back { top: 142px; left: 50%; width: 84px; height: 52px; transform: translateX(-50%); border-radius: 38px; }
-.body-part.abdomen { top: 198px; left: 50%; width: 72px; height: 80px; transform: translateX(-50%); border-radius: 36px; }
-.body-part.lower-back { top: 250px; left: 50%; width: 72px; height: 46px; transform: translateX(-50%); border-radius: 34px; }
-.body-part.pelvis { top: 296px; left: 50%; width: 72px; height: 56px; transform: translateX(-50%); border-radius: 36px; }
-.body-part.left-upper-arm, .body-part.right-upper-arm { top: 116px; width: 22px; height: 78px; border-radius: 18px; }
-.body-part.left-upper-arm { left: 16px; }
-.body-part.right-upper-arm { right: 16px; }
-.body-part.left-forearm, .body-part.right-forearm { top: 194px; width: 18px; height: 72px; border-radius: 16px; }
-.body-part.left-forearm { left: 14px; }
-.body-part.right-forearm { right: 14px; }
-.body-part.left-hand, .body-part.right-hand { top: 278px; width: 18px; height: 28px; border-radius: 14px; }
-.body-part.left-hand { left: 14px; }
-.body-part.right-hand { right: 14px; }
-.body-part.left-thigh, .body-part.right-thigh { top: 302px; width: 28px; height: 78px; border-radius: 20px; }
-.body-part.left-thigh { left: 72px; }
-.body-part.right-thigh { right: 72px; }
-.body-part.left-knee, .body-part.right-knee { top: 378px; width: 22px; height: 20px; border-radius: 14px; }
-.body-part.left-knee { left: 74px; }
-.body-part.right-knee { right: 74px; }
-.body-part.left-calf, .body-part.right-calf { top: 400px; width: 20px; height: 72px; border-radius: 18px; }
-.body-part.left-calf { left: 76px; }
-.body-part.right-calf { right: 76px; }
-.body-part.left-foot, .body-part.right-foot { top: 474px; width: 26px; height: 16px; border-radius: 14px; }
-.body-part.left-foot { left: 70px; }
-.body-part.right-foot { right: 70px; }
-.region-question-panel { margin-top: 18px; padding: 16px 18px 18px; border: 1px solid var(--border-faint); border-radius: var(--r-sm); background: rgba(7,20,38,.9); }
+/* ── Redesigned Body Map ─────────────────────────────── */
+.symptom-card { margin: 0 auto 20px; padding: 18px 16px; border: 1px solid var(--border-faint); border-radius: var(--r-lg); background: rgba(15,35,64,.88); max-width: 840px; }
+.smap-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.smap-header h3 { font-size: 15px; color: var(--text-primary); margin: 0; }
+.symptom-card > p { color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
+.gender-toggle { display: flex; gap: 6px; }
+.gender-btn { display: flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border-faint); background: var(--navy-900); color: var(--text-secondary); transition: all .2s; cursor: pointer; }
+.gender-btn.active { background: var(--accent-dim); border-color: var(--accent-mid); color: var(--accent-glow); }
+.gender-btn:hover:not(.active) { background: var(--navy-800); color: var(--text-primary); }
+.smap-wrap { width: 100%; }
+.smap-svg { width: 100%; height: auto; display: block; max-height: 540px; }
+.smap-dot { fill: rgba(47,158,255,.18); stroke: rgba(47,158,255,.65); stroke-width: 1.5; cursor: pointer; transition: fill .15s, stroke .15s; }
+.smap-dot:hover { fill: rgba(47,158,255,.45); stroke: #5ab4ff; }
+.smap-dot.active { fill: rgba(47,158,255,.7); stroke: #2f9eff; }
+.smap-label { font-size: 10.5px; fill: rgba(255,255,255,.72); cursor: pointer; font-family: 'DM Sans',sans-serif; transition: fill .15s; }
+.smap-label:hover, .smap-label.active { fill: #fff; }
+.smap-line { stroke: rgba(255,255,255,.18); stroke-width: 0.8; pointer-events: none; }
+.region-question-panel { margin-top: 14px; padding: 14px 16px 16px; border: 1px solid var(--border-faint); border-radius: var(--r-sm); background: rgba(7,20,38,.9); }
 .region-question-header { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .region-question-header span { font-size: 12px; color: var(--text-muted); }
 .region-question-header strong { font-size: 15px; color: var(--text-primary); }
@@ -967,7 +934,7 @@ html, body {
 .scroll-thumb:hover { background: rgba(47,158,255,.9); transform: scaleX(1.03); }
 .scroll-thumb:focus { outline: 2px solid rgba(47,158,255,.6); outline-offset: 2px; }
 @media (max-width: 900px) { .scroll-sidebar { right: 8px; } }
-@media (max-width: 700px) { .symptom-card { margin-top: 18px; } .body-silhouette { width: 220px; height: 330px; } .body-part.head { width: 60px; height: 60px; } .body-part.chest { width: 86px; height: 74px; } .body-part.abdomen { width: 74px; height: 86px; } .scroll-sidebar { display: none; } }
+@media (max-width: 700px) { .symptom-card { margin-top: 16px; padding: 14px 12px; } .scroll-sidebar { display: none; } }
 
 /* Typing */
 .typing-row { display: flex; gap: 12px; margin-bottom: 26px; align-items: center; }
@@ -1182,42 +1149,203 @@ html, body {
           <h2 class="welcome-h">How can I help you today?</h2>
           <p class="welcome-p">Describe your symptoms, ask about a condition, or get clear guidance on medications and treatments. I'll respond like a knowledgeable doctor would.</p>
         </div>
-        <div class="symptom-card" aria-label="Symptom map control">
-          <h3>Visual Symptom Map</h3>
-          <p>Click a body region to answer a few focused follow-up questions. After you answer, Remy will summarize your responses and send them into the chat as structured context.</p>
-          <div class="symptom-map" role="group" aria-label="Interactive symptom map">
-            <div class="body-silhouette" id="bodySilhouette">
-              <button type="button" class="body-part head" data-region="Head" aria-label="Head" onclick="selectRegion('Head')"></button>
-              <button type="button" class="body-part left-eye" data-region="Left eye" aria-label="Left eye" onclick="selectRegion('Left eye')"></button>
-              <button type="button" class="body-part right-eye" data-region="Right eye" aria-label="Right eye" onclick="selectRegion('Right eye')"></button>
-              <button type="button" class="body-part nose" data-region="Nose" aria-label="Nose" onclick="selectRegion('Nose')"></button>
-              <button type="button" class="body-part left-ear" data-region="Left ear" aria-label="Left ear" onclick="selectRegion('Left ear')"></button>
-              <button type="button" class="body-part right-ear" data-region="Right ear" aria-label="Right ear" onclick="selectRegion('Right ear')"></button>
-              <button type="button" class="body-part mouth" data-region="Mouth" aria-label="Mouth" onclick="selectRegion('Mouth')"></button>
-              <button type="button" class="body-part neck" data-region="Neck" aria-label="Neck" onclick="selectRegion('Neck')"></button>
-              <button type="button" class="body-part left-shoulder" data-region="Left shoulder" aria-label="Left shoulder" onclick="selectRegion('Left shoulder')"></button>
-              <button type="button" class="body-part right-shoulder" data-region="Right shoulder" aria-label="Right shoulder" onclick="selectRegion('Right shoulder')"></button>
-              <button type="button" class="body-part chest" data-region="Chest" aria-label="Chest" onclick="selectRegion('Chest')"></button>
-              <button type="button" class="body-part upper-back" data-region="Upper back" aria-label="Upper back" onclick="selectRegion('Upper back')"></button>
-              <button type="button" class="body-part abdomen" data-region="Abdomen" aria-label="Abdomen" onclick="selectRegion('Abdomen')"></button>
-              <button type="button" class="body-part lower-back" data-region="Lower back" aria-label="Lower back" onclick="selectRegion('Lower back')"></button>
-              <button type="button" class="body-part pelvis" data-region="Pelvis" aria-label="Pelvis" onclick="selectRegion('Pelvis')"></button>
-              <button type="button" class="body-part left-upper-arm" data-region="Left upper arm" aria-label="Left upper arm" onclick="selectRegion('Left upper arm')"></button>
-              <button type="button" class="body-part right-upper-arm" data-region="Right upper arm" aria-label="Right upper arm" onclick="selectRegion('Right upper arm')"></button>
-              <button type="button" class="body-part left-forearm" data-region="Left forearm" aria-label="Left forearm" onclick="selectRegion('Left forearm')"></button>
-              <button type="button" class="body-part right-forearm" data-region="Right forearm" aria-label="Right forearm" onclick="selectRegion('Right forearm')"></button>
-              <button type="button" class="body-part left-hand" data-region="Left hand" aria-label="Left hand" onclick="selectRegion('Left hand')"></button>
-              <button type="button" class="body-part right-hand" data-region="Right hand" aria-label="Right hand" onclick="selectRegion('Right hand')"></button>
-              <button type="button" class="body-part left-thigh" data-region="Left thigh" aria-label="Left thigh" onclick="selectRegion('Left thigh')"></button>
-              <button type="button" class="body-part right-thigh" data-region="Right thigh" aria-label="Right thigh" onclick="selectRegion('Right thigh')"></button>
-              <button type="button" class="body-part left-knee" data-region="Left knee" aria-label="Left knee" onclick="selectRegion('Left knee')"></button>
-              <button type="button" class="body-part right-knee" data-region="Right knee" aria-label="Right knee" onclick="selectRegion('Right knee')"></button>
-              <button type="button" class="body-part left-calf" data-region="Left calf" aria-label="Left calf" onclick="selectRegion('Left calf')"></button>
-              <button type="button" class="body-part right-calf" data-region="Right calf" aria-label="Right calf" onclick="selectRegion('Right calf')"></button>
-              <button type="button" class="body-part left-foot" data-region="Left foot" aria-label="Left foot" onclick="selectRegion('Left foot')"></button>
-              <button type="button" class="body-part right-foot" data-region="Right foot" aria-label="Right foot" onclick="selectRegion('Right foot')"></button>
+        <div class="symptom-card" aria-label="Symptom map">
+          <div class="smap-header">
+            <h3>Visual Symptom Map</h3>
+            <div class="gender-toggle">
+              <button class="gender-btn active" id="genderMale" onclick="setGender('male')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="10" cy="14" r="5"/><line x1="19" y1="5" x2="14.14" y2="9.86"/><polyline points="15 5 19 5 19 9"/></svg>
+                Male
+              </button>
+              <button class="gender-btn" id="genderFemale" onclick="setGender('female')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="5"/><line x1="12" y1="13" x2="12" y2="21"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+                Female
+              </button>
             </div>
           </div>
+          <p>Click a body region to describe your symptoms.</p>
+          <div class="smap-wrap">
+            <svg class="smap-svg" id="smapSvg" viewBox="0 0 340 530" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="smapBg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0b1c34"/>
+                  <stop offset="100%" stop-color="#152d58"/>
+                </linearGradient>
+                <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="2.5" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <rect width="340" height="530" rx="12" fill="url(#smapBg)"/>
+
+              <!-- ═══════════ MALE SILHOUETTE ═══════════ -->
+              <g id="maleSil" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.6)" stroke-width="1.4" stroke-linejoin="round">
+                <ellipse cx="170" cy="44" rx="30" ry="33"/>
+                <path d="M158,75 L158,95 L182,95 L182,75 Z" rx="4"/>
+                <path d="M108,95 Q88,105 84,124 L80,194 L80,262 L102,270 L102,200 Q104,142 108,110 L232,110 Q236,142 238,200 L238,270 L260,262 L260,194 L256,124 Q252,105 232,95 Z"/>
+                <path d="M80,124 Q62,142 58,196 L60,238 L78,236 Q72,190 88,130 Z"/>
+                <path d="M58,196 Q50,232 52,266 L70,268 Q60,234 60,196 Z"/>
+                <ellipse cx="61" cy="280" rx="11" ry="14"/>
+                <path d="M260,124 Q278,142 282,196 L280,238 L262,236 Q268,190 252,130 Z"/>
+                <path d="M282,196 Q290,232 288,266 L270,268 Q280,234 280,196 Z"/>
+                <ellipse cx="279" cy="280" rx="11" ry="14"/>
+                <path d="M102,270 Q98,284 104,294 L170,298 L236,294 Q242,284 238,270 Z"/>
+                <path d="M104,294 Q94,354 92,390 L112,393 Q116,358 128,298 Z"/>
+                <path d="M236,294 Q246,354 248,390 L228,393 Q224,358 212,298 Z"/>
+                <path d="M92,393 Q86,438 88,474 L108,474 Q112,438 112,393 Z"/>
+                <path d="M248,393 Q254,438 252,474 L232,474 Q228,438 228,393 Z"/>
+                <path d="M88,474 Q77,485 75,494 L110,494 Q117,485 108,474 Z"/>
+                <path d="M252,474 Q263,485 265,494 L230,494 Q223,485 232,474 Z"/>
+              </g>
+
+              <!-- ═══════════ FEMALE SILHOUETTE ═══════════ -->
+              <g id="femaleSil" display="none" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.6)" stroke-width="1.4" stroke-linejoin="round">
+                <ellipse cx="170" cy="44" rx="27" ry="31"/>
+                <path d="M161,73 L161,93 L179,93 L179,73 Z" rx="4"/>
+                <path d="M118,93 Q100,103 96,122 L90,162 Q86,178 86,194 Q86,215 92,228 L96,268 Q96,284 104,296 L170,302 L236,296 Q244,284 244,268 L248,228 Q254,215 254,194 Q254,178 250,162 L244,122 Q240,103 222,93 Z"/>
+                <ellipse cx="148" cy="155" rx="19" ry="15"/>
+                <ellipse cx="192" cy="155" rx="19" ry="15"/>
+                <path d="M90,122 Q72,140 68,194 L70,234 L88,232 Q82,186 98,128 Z"/>
+                <path d="M68,194 Q60,230 62,262 L78,264 Q70,230 70,194 Z"/>
+                <ellipse cx="70" cy="274" rx="10" ry="13"/>
+                <path d="M250,122 Q268,140 272,194 L270,234 L252,232 Q258,186 242,128 Z"/>
+                <path d="M272,194 Q280,230 278,262 L262,264 Q270,230 270,194 Z"/>
+                <ellipse cx="270" cy="274" rx="10" ry="13"/>
+                <path d="M104,296 Q96,312 98,324 L170,328 L242,324 Q244,312 236,296 Z"/>
+                <path d="M98,324 Q86,380 84,416 L106,418 Q112,382 128,328 Z"/>
+                <path d="M242,324 Q254,380 256,416 L234,418 Q228,382 212,328 Z"/>
+                <path d="M84,418 Q78,456 80,490 L104,490 Q108,456 106,418 Z"/>
+                <path d="M256,418 Q262,456 260,490 L236,490 Q232,456 234,418 Z"/>
+                <path d="M80,490 Q70,500 68,508 L104,508 Q110,500 104,490 Z"/>
+                <path d="M260,490 Q270,500 272,508 L236,508 Q230,500 236,490 Z"/>
+              </g>
+
+              <!-- ═══════════ SHARED HOTSPOTS ═══════════ -->
+              <!-- Head -->
+              <line class="smap-line" x1="170" y1="44" x2="52" y2="44"/>
+              <text class="smap-label" x="48" y="48" text-anchor="end" onclick="selectRegion('Head')">Head</text>
+              <circle class="smap-dot" cx="170" cy="44" r="6" data-region="Head" onclick="selectRegion('Head')"/>
+
+              <!-- Neck -->
+              <line class="smap-line" x1="170" y1="85" x2="288" y2="85"/>
+              <text class="smap-label" x="292" y="89" text-anchor="start" onclick="selectRegion('Neck')">Neck</text>
+              <circle class="smap-dot" cx="170" cy="85" r="5" data-region="Neck" onclick="selectRegion('Neck')"/>
+
+              <!-- Left Shoulder -->
+              <line class="smap-line" x1="108" y1="110" x2="52" y2="110"/>
+              <text class="smap-label" x="48" y="114" text-anchor="end" onclick="selectRegion('Left shoulder')">L. Shoulder</text>
+              <circle class="smap-dot" cx="108" cy="110" r="5" data-region="Left shoulder" onclick="selectRegion('Left shoulder')"/>
+
+              <!-- Right Shoulder -->
+              <line class="smap-line" x1="232" y1="110" x2="288" y2="110"/>
+              <text class="smap-label" x="292" y="114" text-anchor="start" onclick="selectRegion('Right shoulder')">R. Shoulder</text>
+              <circle class="smap-dot" cx="232" cy="110" r="5" data-region="Right shoulder" onclick="selectRegion('Right shoulder')"/>
+
+              <!-- Left Arm -->
+              <line class="smap-line" x1="72" y1="170" x2="52" y2="150"/>
+              <text class="smap-label" x="48" y="154" text-anchor="end" onclick="selectRegion('Left upper arm')">L. Arm</text>
+              <circle class="smap-dot" cx="72" cy="170" r="5" data-region="Left upper arm" onclick="selectRegion('Left upper arm')"/>
+
+              <!-- Right Arm -->
+              <line class="smap-line" x1="268" y1="170" x2="288" y2="150"/>
+              <text class="smap-label" x="292" y="154" text-anchor="start" onclick="selectRegion('Right upper arm')">R. Arm</text>
+              <circle class="smap-dot" cx="268" cy="170" r="5" data-region="Right upper arm" onclick="selectRegion('Right upper arm')"/>
+
+              <!-- Abdomen -->
+              <line class="smap-line" x1="170" y1="198" x2="52" y2="198"/>
+              <text class="smap-label" x="48" y="202" text-anchor="end" onclick="selectRegion('Abdomen')">Abdomen</text>
+              <circle class="smap-dot" cx="170" cy="198" r="5" data-region="Abdomen" onclick="selectRegion('Abdomen')"/>
+
+              <!-- Left Forearm -->
+              <line class="smap-line" x1="60" y1="228" x2="52" y2="218"/>
+              <text class="smap-label" x="48" y="222" text-anchor="end" onclick="selectRegion('Left forearm')">L. Forearm</text>
+              <circle class="smap-dot" cx="60" cy="228" r="5" data-region="Left forearm" onclick="selectRegion('Left forearm')"/>
+
+              <!-- Right Forearm -->
+              <line class="smap-line" x1="280" y1="228" x2="288" y2="218"/>
+              <text class="smap-label" x="292" y="222" text-anchor="start" onclick="selectRegion('Right forearm')">R. Forearm</text>
+              <circle class="smap-dot" cx="280" cy="228" r="5" data-region="Right forearm" onclick="selectRegion('Right forearm')"/>
+
+              <!-- Left Hand -->
+              <line class="smap-line" x1="61" y1="280" x2="52" y2="268"/>
+              <text class="smap-label" x="48" y="272" text-anchor="end" onclick="selectRegion('Left hand')">L. Hand</text>
+              <circle class="smap-dot" cx="61" cy="280" r="5" data-region="Left hand" onclick="selectRegion('Left hand')"/>
+
+              <!-- Right Hand -->
+              <line class="smap-line" x1="279" y1="280" x2="288" y2="268"/>
+              <text class="smap-label" x="292" y="272" text-anchor="start" onclick="selectRegion('Right hand')">R. Hand</text>
+              <circle class="smap-dot" cx="279" cy="280" r="5" data-region="Right hand" onclick="selectRegion('Right hand')"/>
+
+              <!-- Left Thigh -->
+              <line class="smap-line" x1="118" y1="342" x2="52" y2="342"/>
+              <text class="smap-label" x="48" y="346" text-anchor="end" onclick="selectRegion('Left thigh')">L. Thigh</text>
+              <circle class="smap-dot" cx="118" cy="342" r="5" data-region="Left thigh" onclick="selectRegion('Left thigh')"/>
+
+              <!-- Right Thigh -->
+              <line class="smap-line" x1="222" y1="342" x2="288" y2="342"/>
+              <text class="smap-label" x="292" y="346" text-anchor="start" onclick="selectRegion('Right thigh')">R. Thigh</text>
+              <circle class="smap-dot" cx="222" cy="342" r="5" data-region="Right thigh" onclick="selectRegion('Right thigh')"/>
+
+              <!-- Left Knee -->
+              <line class="smap-line" x1="102" y1="392" x2="52" y2="392"/>
+              <text class="smap-label" x="48" y="396" text-anchor="end" onclick="selectRegion('Left knee')">L. Knee</text>
+              <circle class="smap-dot" cx="102" cy="392" r="5" data-region="Left knee" onclick="selectRegion('Left knee')"/>
+
+              <!-- Right Knee -->
+              <line class="smap-line" x1="238" y1="392" x2="288" y2="392"/>
+              <text class="smap-label" x="292" y="396" text-anchor="start" onclick="selectRegion('Right knee')">R. Knee</text>
+              <circle class="smap-dot" cx="238" cy="392" r="5" data-region="Right knee" onclick="selectRegion('Right knee')"/>
+
+              <!-- Left Calf -->
+              <line class="smap-line" x1="100" y1="436" x2="52" y2="436"/>
+              <text class="smap-label" x="48" y="440" text-anchor="end" onclick="selectRegion('Left calf')">L. Calf</text>
+              <circle class="smap-dot" cx="100" cy="436" r="5" data-region="Left calf" onclick="selectRegion('Left calf')"/>
+
+              <!-- Right Calf -->
+              <line class="smap-line" x1="240" y1="436" x2="288" y2="436"/>
+              <text class="smap-label" x="292" y="440" text-anchor="start" onclick="selectRegion('Right calf')">R. Calf</text>
+              <circle class="smap-dot" cx="240" cy="436" r="5" data-region="Right calf" onclick="selectRegion('Right calf')"/>
+
+              <!-- Left Foot -->
+              <line class="smap-line" x1="93" y1="484" x2="52" y2="484"/>
+              <text class="smap-label" x="48" y="488" text-anchor="end" onclick="selectRegion('Left foot')">L. Foot</text>
+              <circle class="smap-dot" cx="93" cy="484" r="5" data-region="Left foot" onclick="selectRegion('Left foot')"/>
+
+              <!-- Right Foot -->
+              <line class="smap-line" x1="247" y1="484" x2="288" y2="484"/>
+              <text class="smap-label" x="292" y="488" text-anchor="start" onclick="selectRegion('Right foot')">R. Foot</text>
+              <circle class="smap-dot" cx="247" cy="484" r="5" data-region="Right foot" onclick="selectRegion('Right foot')"/>
+
+              <!-- ═══════════ MALE-ONLY HOTSPOTS ═══════════ -->
+              <g id="maleParts">
+                <!-- Chest -->
+                <line class="smap-line" x1="170" y1="150" x2="288" y2="136"/>
+                <text class="smap-label" x="292" y="140" text-anchor="start" onclick="selectRegion('Chest')">Chest</text>
+                <circle class="smap-dot" cx="170" cy="150" r="5" data-region="Chest" onclick="selectRegion('Chest')"/>
+                <!-- Pelvis/Groin -->
+                <line class="smap-line" x1="170" y1="294" x2="288" y2="294"/>
+                <text class="smap-label" x="292" y="298" text-anchor="start" onclick="selectRegion('Groin')">Groin</text>
+                <circle class="smap-dot" cx="170" cy="294" r="5" data-region="Groin" onclick="selectRegion('Groin')"/>
+              </g>
+
+              <!-- ═══════════ FEMALE-ONLY HOTSPOTS ═══════════ -->
+              <g id="femaleParts" display="none">
+                <!-- Left Breast -->
+                <line class="smap-line" x1="148" y1="155" x2="52" y2="138"/>
+                <text class="smap-label" x="48" y="142" text-anchor="end" onclick="selectRegion('Left breast')">L. Breast</text>
+                <circle class="smap-dot" cx="148" cy="155" r="5" data-region="Left breast" onclick="selectRegion('Left breast')"/>
+                <!-- Right Breast -->
+                <line class="smap-line" x1="192" y1="155" x2="288" y2="138"/>
+                <text class="smap-label" x="292" y="142" text-anchor="start" onclick="selectRegion('Right breast')">R. Breast</text>
+                <circle class="smap-dot" cx="192" cy="155" r="5" data-region="Right breast" onclick="selectRegion('Right breast')"/>
+                <!-- Uterus/Pelvis -->
+                <line class="smap-line" x1="170" y1="288" x2="288" y2="288"/>
+                <text class="smap-label" x="292" y="292" text-anchor="start" onclick="selectRegion('Uterus / Pelvis')">Uterus</text>
+                <circle class="smap-dot" cx="170" cy="288" r="5" data-region="Uterus / Pelvis" onclick="selectRegion('Uterus / Pelvis')"/>
+              </g>
+            </svg>
+          </div>
+
           <div class="region-question-panel" id="regionQuestionPanel" hidden>
             <div class="region-question-header">
               <span>Selected body region</span>
@@ -1439,16 +1567,25 @@ let selectedSymptomRegion = null;
 let regionResponses = {};
 
 function selectRegion(region) {
-  if (selectedSymptomRegion === region) {
-    cancelRegionSelection();
-    return;
-  }
+  if (selectedSymptomRegion === region) { cancelRegionSelection(); return; }
   selectedSymptomRegion = region;
   regionResponses = {};
   document.getElementById('selectedRegionName').textContent = region;
   document.getElementById('regionQuestionPanel').hidden = false;
   renderRegionQuestions(region);
-  document.querySelectorAll('.body-part').forEach(el => el.classList.toggle('active', el.dataset.region === region));
+  document.querySelectorAll('.smap-dot, .smap-label').forEach(el => {
+    el.classList.toggle('active', el.dataset.region === region || el.getAttribute('onclick') === "selectRegion('" + region + "')");
+  });
+}
+
+function setGender(g) {
+  document.getElementById('maleSil').style.display   = g === 'male'   ? '' : 'none';
+  document.getElementById('femaleSil').style.display = g === 'female' ? '' : 'none';
+  document.getElementById('maleParts').style.display   = g === 'male'   ? '' : 'none';
+  document.getElementById('femaleParts').style.display = g === 'female' ? '' : 'none';
+  document.getElementById('genderMale').classList.toggle('active',   g === 'male');
+  document.getElementById('genderFemale').classList.toggle('active', g === 'female');
+  cancelRegionSelection();
 }
 
 let isThumbDragging = false;
@@ -1550,7 +1687,7 @@ function cancelRegionSelection() {
   document.getElementById('regionQuestionPanel').hidden = true;
   document.getElementById('regionQuestions').innerHTML = '';
   document.getElementById('submitRegionBtn').disabled = true;
-  document.querySelectorAll('.body-part.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.smap-dot.active, .smap-label.active').forEach(el => el.classList.remove('active'));
 }
 
 function renderRegionQuestions(region) {
