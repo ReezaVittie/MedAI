@@ -1107,9 +1107,9 @@ html, body {
     Topbar/sidebar stay deep blue → white text there.
     Main content surfaces are lightened → very dark navy text.   */
 body.light {
-  --navy-950: #d8e8f2;   /* chat / page background — user reference colour */
-  --navy-900: #2e76f4;
-  --navy-850: #2068ee;
+  --navy-950: #d8e8f2;   /* chat / page background */
+  --navy-900: #091828;   /* sidebar — user reference dark navy */
+  --navy-850: #0d2035;
   --navy-800: #175ce4;
   --navy-700: #1150d6;
   --navy-600: #0d46c8;
@@ -1147,10 +1147,10 @@ body.light {
   --border-mid:    rgba(3,16,30,0.24);
 }
 
-/* ── Topbar: deep blue, explicit white text ─────────────────── */
+/* ── Topbar: dark navy, explicit white text ─────────────────── */
 body.light .topbar {
-  background: rgba(22,88,220,0.97);
-  border-bottom-color: rgba(255,255,255,0.14);
+  background: rgba(9,24,40,0.97);
+  border-bottom-color: rgba(255,255,255,0.10);
 }
 body.light .topbar-title { color: #ffffff; }
 body.light .topbar .icon-btn,
