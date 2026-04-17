@@ -1100,6 +1100,102 @@ html, body {
   .topbar-actions { gap: 2px; }
   .icon-btn { width: 40px; height: 40px; }
 }
+
+/* ─── Light Mode ──────────────────────────────── */
+body.light {
+  --navy-950: #f0f5fb;
+  --navy-900: #e4edf7;
+  --navy-850: #d8e6f2;
+  --navy-800: #c7d9ec;
+  --navy-700: #adc6e0;
+  --navy-600: #8aaece;
+  --navy-400: #4e85bc;
+  --navy-300: #2c6ba6;
+  --navy-200: #1a5090;
+  --navy-100: #0d3470;
+
+  --accent:      #1a6fc4;
+  --accent-dim:  rgba(26,111,196,0.10);
+  --accent-mid:  rgba(26,111,196,0.26);
+  --accent-glow: #1557a8;
+
+  --teal:     #0891b2;
+  --teal-dim: rgba(8,145,178,0.10);
+
+  --amber:     #d97706;
+  --amber-dim: rgba(217,119,6,0.10);
+
+  --red:     #dc2626;
+  --red-dim: rgba(220,38,38,0.08);
+
+  --green:     #16a34a;
+  --green-dim: rgba(22,163,74,0.08);
+
+  --text-primary:   #0c2040;
+  --text-secondary: #284e7e;
+  --text-muted:     #6b8fb0;
+
+  --border-faint:  rgba(12,32,64,0.07);
+  --border-subtle: rgba(12,32,64,0.12);
+  --border-mid:    rgba(12,32,64,0.18);
+}
+
+/* Topbar background override (hardcoded rgba in base) */
+body.light .topbar {
+  background: rgba(224,236,249,0.94);
+  border-bottom-color: rgba(12,32,64,0.10);
+}
+/* Sidebar border */
+body.light .sidebar { border-right-color: rgba(12,32,64,0.10); }
+
+/* Symptom card */
+body.light .symptom-card { background: rgba(224,236,249,0.92); }
+
+/* Body silhouette — hardcoded dark gradient */
+body.light .body-silhouette {
+  background: linear-gradient(180deg, rgba(208,228,248,.98) 0%, rgba(188,214,238,.96) 50%, rgba(166,198,226,.92) 100%);
+  border-color: rgba(12,32,64,0.14);
+}
+body.light .body-silhouette::before,
+body.light .body-silhouette::after { background: rgba(12,32,64,0.09); }
+body.light .body-part { border-color: rgba(26,111,196,0.30); background: rgba(26,111,196,0.08); }
+body.light .body-part:hover, body.light .body-part:focus { background: rgba(26,111,196,0.22); border-color: rgba(26,111,196,0.60); }
+body.light .body-part.active { background: rgba(26,111,196,0.32); border-color: rgba(26,111,196,0.72); }
+body.light .body-part::after { background: rgba(224,236,249,0.96); color: var(--text-primary); border-color: rgba(12,32,64,0.12); }
+
+/* Region question panel */
+body.light .region-question-panel { background: rgba(224,236,249,0.95); }
+body.light .question-choice button { background: var(--navy-900); border-color: var(--border-faint); }
+body.light .question-choice button.selected { background: rgba(26,111,196,0.18); border-color: rgba(26,111,196,0.50); }
+body.light .question-input { background: rgba(255,255,255,0.60); color: var(--text-primary); border-color: var(--border-subtle); }
+
+/* Input zone fade */
+body.light .input-zone::before { background: linear-gradient(to top, var(--navy-950), transparent); }
+
+/* Scroll thumb */
+body.light .scroll-track { background: rgba(12,32,64,0.08); border-color: rgba(12,32,64,0.10); }
+
+/* Typing bubble */
+body.light .typing-bub { background: var(--navy-850); border-color: var(--border-subtle); }
+
+/* Disclaimer pill */
+body.light .disclaimer-pill { background: rgba(217,119,6,0.10); border-color: rgba(217,119,6,0.22); }
+
+/* Follow-up buttons */
+body.light .follow-up-btn { background: var(--navy-900); border-color: var(--border-faint); color: var(--text-primary); }
+body.light .follow-up-btn:hover:not(:disabled) { background: var(--navy-850); border-color: rgba(26,111,196,0.40); color: var(--accent-glow); }
+
+/* Theme toggle button active state */
+.theme-toggle-btn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--border-faint); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all .2s; position: relative; overflow: hidden; }
+.theme-toggle-btn:hover { background: var(--navy-800); color: var(--text-primary); border-color: var(--border-subtle); }
+.theme-toggle-btn .icon-sun, .theme-toggle-btn .icon-moon { position: absolute; transition: opacity .25s, transform .25s; }
+.theme-toggle-btn .icon-sun  { opacity: 1; transform: rotate(0deg) scale(1); }
+.theme-toggle-btn .icon-moon { opacity: 0; transform: rotate(-30deg) scale(0.7); }
+body.light .theme-toggle-btn .icon-sun  { opacity: 0; transform: rotate(30deg) scale(0.7); }
+body.light .theme-toggle-btn .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
+@media (max-width: 700px) {
+  .theme-toggle-btn { width: 44px; height: 44px; }
+}
 </style>
 </head>
 <body>
@@ -1162,6 +1258,12 @@ html, body {
       <div class="topbar-actions">
         <button class="icon-btn" title="Clear chat" onclick="clearChat()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+        </button>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle light / dark mode" onclick="toggleTheme()">
+          <!-- Sun icon (shown in dark mode → click to go light) -->
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <!-- Moon icon (shown in light mode → click to go dark) -->
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
         <button class="icon-btn" title="Sign out" onclick="window.location.href='/signout'">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -1965,6 +2067,21 @@ function useStarter(text) {
 /* ── Textarea auto-grow ── */
 function grow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; }
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+
+/* ── Theme toggle ── */
+function initTheme() {
+  const saved = localStorage.getItem('medai-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('medai-theme', isLight ? 'light' : 'dark');
+  // Update theme-color meta tag for Android chrome toolbar
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', isLight ? '#e4edf7' : '#040c18');
+}
+initTheme();
 
 /* ── Utils ── */
 function esc(str) {
