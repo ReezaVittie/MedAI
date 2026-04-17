@@ -1102,92 +1102,139 @@ html, body {
 }
 
 /* ─── Light Mode ──────────────────────────────── */
+/*  Base blue from user reference: #3d82f6
+    Surfaces shade progressively deeper; all text is white.      */
 body.light {
-  /* Surfaces — noticeably deeper steel-blue tones */
-  --navy-950: #d6e5f3;
-  --navy-900: #c4d8ed;
-  --navy-850: #b5cce6;
-  --navy-800: #a3bedd;
-  --navy-700: #8aaece;
-  --navy-600: #6d9bbf;
-  --navy-400: #3e74aa;
-  --navy-300: #245f96;
-  --navy-200: #124d82;
-  --navy-100: #083b6e;
+  --navy-950: #3d82f6;   /* page background  */
+  --navy-900: #2e76f4;   /* sidebar          */
+  --navy-850: #2068ee;   /* cards / bubbles  */
+  --navy-800: #175ce4;   /* input card       */
+  --navy-700: #1150d6;   /* deep surfaces    */
+  --navy-600: #0d46c8;   /* deepest          */
+  --navy-400: #6fa8f8;   /* light accent tint */
+  --navy-300: #93bffb;
+  --navy-200: #b8d4fd;
+  --navy-100: #d8eafe;
 
-  --accent:      #1160b8;
-  --accent-dim:  rgba(17,96,184,0.12);
-  --accent-mid:  rgba(17,96,184,0.28);
-  --accent-glow: #0e4f9e;
+  /* Accent — near-white ice blue so buttons pop on the blue bg */
+  --accent:      #dceeff;
+  --accent-dim:  rgba(220,238,255,0.14);
+  --accent-mid:  rgba(220,238,255,0.26);
+  --accent-glow: #ffffff;
 
-  --teal:     #0779a0;
-  --teal-dim: rgba(7,121,160,0.12);
+  /* Supporting palette — vivid so they read against saturated blue */
+  --teal:     #2dd4c0;
+  --teal-dim: rgba(45,212,192,0.14);
 
-  --amber:     #b45309;
-  --amber-dim: rgba(180,83,9,0.12);
+  --amber:     #fbbf24;
+  --amber-dim: rgba(251,191,36,0.18);
 
-  --red:     #b91c1c;
-  --red-dim: rgba(185,28,28,0.10);
+  --red:     #f87171;
+  --red-dim: rgba(248,113,113,0.14);
 
-  --green:     #15803d;
-  --green-dim: rgba(21,128,61,0.10);
+  --green:     #4ade80;
+  --green-dim: rgba(74,222,128,0.14);
 
-  /* Text — high contrast against the deeper blue surfaces */
-  --text-primary:   #05131f;
-  --text-secondary: #163352;
-  --text-muted:     #3d6080;
+  /* Text — white on blue */
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255,255,255,0.84);
+  --text-muted:     rgba(255,255,255,0.54);
 
-  --border-faint:  rgba(5,19,31,0.10);
-  --border-subtle: rgba(5,19,31,0.16);
-  --border-mid:    rgba(5,19,31,0.24);
+  /* Borders — white-based */
+  --border-faint:  rgba(255,255,255,0.11);
+  --border-subtle: rgba(255,255,255,0.20);
+  --border-mid:    rgba(255,255,255,0.32);
 }
 
-/* Topbar background override (hardcoded rgba in base) */
+/* Topbar — slightly deeper than bg */
 body.light .topbar {
-  background: rgba(196,216,237,0.96);
-  border-bottom-color: rgba(5,19,31,0.14);
+  background: rgba(30,95,230,0.96);
+  border-bottom-color: rgba(255,255,255,0.14);
 }
-/* Sidebar border */
-body.light .sidebar { border-right-color: rgba(5,19,31,0.12); }
+/* Sidebar divider */
+body.light .sidebar { border-right-color: rgba(255,255,255,0.12); }
 
-/* Symptom card */
-body.light .symptom-card { background: rgba(196,216,237,0.95); }
+/* Brand icon — frosted glass look on blue bg */
+body.light .brand-icon {
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 0 16px rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.28);
+}
 
-/* Body silhouette — distinct darker-blue gradient for contrast */
+/* Starter cards */
+body.light .starter { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+body.light .starter:hover { background: rgba(255,255,255,0.20); border-color: rgba(255,255,255,0.38); box-shadow: 0 8px 24px rgba(0,0,0,0.20); }
+
+/* Send button — white fill so it pops */
+body.light .send-btn { background: #ffffff; color: #1a5fd8; }
+body.light .send-btn:hover { background: #dceeff; }
+
+/* Symptom card container */
+body.light .symptom-card { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+
+/* Body silhouette — deep navy so it stands out against the bright blue */
 body.light .body-silhouette {
-  background: linear-gradient(180deg, rgba(155,195,230,.98) 0%, rgba(128,174,215,.97) 50%, rgba(100,152,198,.94) 100%);
-  border: 1px solid rgba(17,96,184,0.30);
+  background: linear-gradient(180deg, #0f3db8 0%, #0a2f9e 55%, #072482 100%);
+  border: 1px solid rgba(255,255,255,0.22);
 }
-/* Spine / shoulder guide lines — visible on the new background */
 body.light .body-silhouette::before,
-body.light .body-silhouette::after { background: rgba(17,96,184,0.28); }
-/* Body-part hotspots — clear outlines, visible fill */
-body.light .body-part { border-color: rgba(17,96,184,0.55); background: rgba(17,96,184,0.18); }
-body.light .body-part:hover, body.light .body-part:focus { background: rgba(17,96,184,0.38); border-color: rgba(17,96,184,0.80); }
-body.light .body-part.active { background: rgba(17,96,184,0.48); border-color: rgba(17,96,184,0.90); }
-body.light .body-part::after { background: rgba(196,216,237,0.97); color: var(--text-primary); border-color: rgba(5,19,31,0.18); }
+body.light .body-silhouette::after { background: rgba(255,255,255,0.24); }
+/* Hotspots — white outlines against the dark silhouette */
+body.light .body-part { border-color: rgba(255,255,255,0.52); background: rgba(255,255,255,0.12); }
+body.light .body-part:hover, body.light .body-part:focus { background: rgba(255,255,255,0.34); border-color: rgba(255,255,255,0.84); }
+body.light .body-part.active { background: rgba(255,255,255,0.46); border-color: #ffffff; }
+body.light .body-part::after { background: rgba(10,47,158,0.97); color: #ffffff; border-color: rgba(255,255,255,0.30); }
 
 /* Region question panel */
-body.light .region-question-panel { background: rgba(196,216,237,0.97); }
-body.light .question-choice button { background: var(--navy-900); border-color: var(--border-subtle); color: var(--text-primary); }
-body.light .question-choice button.selected { background: rgba(17,96,184,0.22); border-color: rgba(17,96,184,0.58); color: var(--accent); }
-body.light .question-input { background: rgba(255,255,255,0.50); color: var(--text-primary); border-color: var(--border-subtle); }
+body.light .region-question-panel { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.20); }
+body.light .question-choice button { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.24); color: #ffffff; }
+body.light .question-choice button:hover { background: rgba(255,255,255,0.22); }
+body.light .question-choice button.selected { background: rgba(255,255,255,0.30); border-color: rgba(255,255,255,0.65); color: #ffffff; font-weight: 600; }
+body.light .question-input { background: rgba(255,255,255,0.12); color: #ffffff; border-color: rgba(255,255,255,0.28); }
+body.light .question-input::placeholder { color: rgba(255,255,255,0.50); }
+body.light .primary-btn { background: #ffffff; color: #1a5fd8; }
+body.light .secondary-btn { background: rgba(255,255,255,0.12); color: #ffffff; border-color: rgba(255,255,255,0.25); }
 
-/* Input zone fade */
+/* Input zone & card */
 body.light .input-zone::before { background: linear-gradient(to top, var(--navy-950), transparent); }
+body.light .input-card { background: var(--navy-800); border-color: var(--border-mid); }
+body.light .chat-ta::placeholder { color: rgba(255,255,255,0.48); }
 
-/* Scroll thumb */
-body.light .scroll-track { background: rgba(12,32,64,0.08); border-color: rgba(12,32,64,0.10); }
+/* Scroll bar */
+body.light .scroll-track { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.16); }
 
 /* Typing bubble */
-body.light .typing-bub { background: var(--navy-850); border-color: var(--border-subtle); }
+body.light .typing-bub { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
 
 /* Disclaimer pill */
-body.light .disclaimer-pill { background: rgba(217,119,6,0.10); border-color: rgba(217,119,6,0.22); }
+body.light .disclaimer-pill { background: rgba(251,191,36,0.16); border-color: rgba(251,191,36,0.32); color: #fbbf24; }
 
-/* Follow-up buttons */
-body.light .follow-up-btn { background: var(--navy-900); border-color: var(--border-faint); color: var(--text-primary); }
-body.light .follow-up-btn:hover:not(:disabled) { background: var(--navy-850); border-color: rgba(26,111,196,0.40); color: var(--accent-glow); }
+/* Follow-up suggestion buttons */
+body.light .follow-up-btn { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); color: #ffffff; }
+body.light .follow-up-btn:hover:not(:disabled) { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.45); }
+
+/* Search wrap */
+body.light .search-wrap { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+body.light .search-wrap input::placeholder { color: rgba(255,255,255,0.50); }
+
+/* Conversation list items */
+body.light .conv-item:hover { background: rgba(255,255,255,0.10); }
+body.light .conv-item.active { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.32); }
+
+/* Message bubble tones */
+body.light .b-ai   { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
+body.light .b-user { background: rgba(10,47,158,0.50);   border-color: rgba(255,255,255,0.18); }
+
+/* Icon / toggle buttons on blue topbar */
+body.light .icon-btn, body.light .toggle-btn, body.light .theme-toggle-btn {
+  border-color: rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.82);
+}
+body.light .icon-btn:hover, body.light .toggle-btn:hover, body.light .theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.40);
+  color: #ffffff;
+}
 
 /* Theme toggle button active state */
 .theme-toggle-btn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--border-faint); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all .2s; position: relative; overflow: hidden; }
