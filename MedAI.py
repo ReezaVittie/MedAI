@@ -1102,27 +1102,28 @@ html, body {
 }
 
 /* ─── Light Mode ──────────────────────────────── */
-/*  Base blue from user reference: #3d82f6
-    Surfaces shade progressively deeper; all text is white.      */
+/*  Background = user reference #3d82f6.
+    Brand icon unchanged (same as dark mode — no override).
+    Topbar/sidebar stay deep blue → white text there.
+    Main content surfaces are lightened → very dark navy text.   */
 body.light {
-  --navy-950: #3d82f6;   /* page background  */
-  --navy-900: #2e76f4;   /* sidebar          */
-  --navy-850: #2068ee;   /* cards / bubbles  */
-  --navy-800: #175ce4;   /* input card       */
-  --navy-700: #1150d6;   /* deep surfaces    */
-  --navy-600: #0d46c8;   /* deepest          */
-  --navy-400: #6fa8f8;   /* light accent tint */
+  --navy-950: #3d82f6;
+  --navy-900: #2e76f4;
+  --navy-850: #2068ee;
+  --navy-800: #175ce4;
+  --navy-700: #1150d6;
+  --navy-600: #0d46c8;
+  --navy-400: #6fa8f8;
   --navy-300: #93bffb;
   --navy-200: #b8d4fd;
   --navy-100: #d8eafe;
 
-  /* Accent — near-white ice blue so buttons pop on the blue bg */
-  --accent:      #dceeff;
-  --accent-dim:  rgba(220,238,255,0.14);
-  --accent-mid:  rgba(220,238,255,0.26);
-  --accent-glow: #ffffff;
+  /* Accent identical to dark mode — preserves brand icon gradient */
+  --accent:      #2f9eff;
+  --accent-dim:  rgba(47,158,255,0.14);
+  --accent-mid:  rgba(47,158,255,0.28);
+  --accent-glow: #5ab4ff;
 
-  /* Supporting palette — vivid so they read against saturated blue */
   --teal:     #2dd4c0;
   --teal-dim: rgba(45,212,192,0.14);
 
@@ -1135,106 +1136,192 @@ body.light {
   --green:     #4ade80;
   --green-dim: rgba(74,222,128,0.14);
 
-  /* Text — white on blue */
-  --text-primary:   #ffffff;
-  --text-secondary: rgba(255,255,255,0.84);
-  --text-muted:     rgba(255,255,255,0.54);
+  /* Very dark navy text for main content (high contrast on lightened surfaces) */
+  --text-primary:   #03101e;
+  --text-secondary: #0a2540;
+  --text-muted:     #1d4465;
 
-  /* Borders — white-based */
-  --border-faint:  rgba(255,255,255,0.11);
-  --border-subtle: rgba(255,255,255,0.20);
-  --border-mid:    rgba(255,255,255,0.32);
+  /* Dark-based borders for light surfaces */
+  --border-faint:  rgba(3,16,30,0.09);
+  --border-subtle: rgba(3,16,30,0.16);
+  --border-mid:    rgba(3,16,30,0.24);
 }
 
-/* Topbar — slightly deeper than bg */
+/* ── Topbar: deep blue, explicit white text ─────────────────── */
 body.light .topbar {
-  background: rgba(30,95,230,0.96);
+  background: rgba(22,88,220,0.97);
   border-bottom-color: rgba(255,255,255,0.14);
 }
-/* Sidebar divider */
-body.light .sidebar { border-right-color: rgba(255,255,255,0.12); }
-
-/* Brand icon — frosted glass look on blue bg */
-body.light .brand-icon {
-  background: rgba(255,255,255,0.22);
-  box-shadow: 0 0 16px rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.28);
+body.light .topbar-title { color: #ffffff; }
+body.light .topbar .icon-btn,
+body.light .topbar .toggle-btn,
+body.light .topbar .theme-toggle-btn {
+  color: rgba(255,255,255,0.82);
+  border-color: rgba(255,255,255,0.22);
+}
+body.light .topbar .icon-btn:hover,
+body.light .topbar .toggle-btn:hover,
+body.light .topbar .theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.14);
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.40);
 }
 
-/* Starter cards */
-body.light .starter { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
-body.light .starter:hover { background: rgba(255,255,255,0.20); border-color: rgba(255,255,255,0.38); box-shadow: 0 8px 24px rgba(0,0,0,0.20); }
+/* ── Sidebar: deep blue, explicit white text ────────────────── */
+body.light .sidebar { border-right-color: rgba(255,255,255,0.12); }
+body.light .brand-name,
+body.light .brand-sub,
+body.light .section-lbl,
+body.light .conv-title,
+body.light .conv-preview,
+body.light .conv-time   { color: #ffffff !important; }
+body.light .no-convs    { color: rgba(255,255,255,0.60); }
+body.light .new-chat-btn {
+  color: #ffffff;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.26);
+}
+body.light .new-chat-btn:hover {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.46);
+}
+body.light .search-wrap {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.20);
+  color: #ffffff;
+}
+body.light .search-wrap input { color: #ffffff; }
+body.light .search-wrap input::placeholder { color: rgba(255,255,255,0.50); }
+body.light .conv-item:hover  { background: rgba(255,255,255,0.10); }
+body.light .conv-item.active { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.34); }
+body.light .conv-action,
+body.light .conv-del          { color: rgba(255,255,255,0.55); }
+body.light .conv-action:hover { color: #ffffff; }
+body.light .conv-del:hover    { color: #f87171; }
+body.light .disclaimer-pill   { background: rgba(251,191,36,0.16); border-color: rgba(251,191,36,0.34); color: #fbbf24; }
 
-/* Send button — white fill so it pops */
-body.light .send-btn { background: #ffffff; color: #1a5fd8; }
-body.light .send-btn:hover { background: #dceeff; }
+/* ── Main content: lightened surfaces + dark navy text ──────── */
+/* Chat bubbles — semi-transparent white so dark text reads */
+body.light .b-ai {
+  background: rgba(255,255,255,0.50);
+  border-color: rgba(3,16,30,0.12);
+  color: var(--text-primary);
+}
+body.light .b-user {
+  background: rgba(255,255,255,0.32);
+  border-color: rgba(3,16,30,0.10);
+  color: var(--text-primary);
+}
+body.light .bubble strong { color: #0d3a9e; }
+body.light .bubble code    { color: #0779a0; background: rgba(3,16,30,0.08); }
 
-/* Symptom card container */
-body.light .symptom-card { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+/* Message meta */
+body.light .who-ai   { color: #1045b0; }
+body.light .who-user { color: #0779a0; }
+body.light .msg-ts   { color: #1d4465; }
+body.light .copy-btn { background: rgba(3,16,30,0.06); border-color: rgba(3,16,30,0.14); color: #1d4465; }
+body.light .copy-btn:hover { background: rgba(47,158,255,0.14); color: #0d3a9e; border-color: rgba(47,158,255,0.35); }
 
-/* Body silhouette — deep navy so it stands out against the bright blue */
+/* Welcome / starter cards */
+body.light .welcome-h    { color: var(--text-primary); }
+body.light .welcome-intro{ color: #0d3a9e; }
+body.light .welcome-p    { color: var(--text-secondary); }
+body.light .starter {
+  background: rgba(255,255,255,0.30);
+  border-color: rgba(3,16,30,0.12);
+}
+body.light .starter:hover {
+  background: rgba(255,255,255,0.46);
+  border-color: rgba(47,158,255,0.40);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+body.light .s-lbl         { color: var(--text-primary); }
+body.light .s-lbl span    { color: var(--text-secondary); }
+
+/* Input card */
+body.light .input-card {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(3,16,30,0.18);
+}
+body.light .input-card:focus-within { border-color: rgba(47,158,255,0.50); }
+body.light .chat-ta { color: var(--text-primary); caret-color: #0d3a9e; }
+body.light .chat-ta::placeholder { color: rgba(3,16,30,0.40); }
+body.light .input-zone::before { background: linear-gradient(to top, var(--navy-950), transparent); }
+body.light .input-hint  { color: var(--text-muted); }
+body.light .input-hint kbd { background: rgba(255,255,255,0.30); color: var(--text-secondary); border-color: rgba(3,16,30,0.16); }
+/* Send button — white pill with dark-blue icon for strong visibility */
+body.light .send-btn { background: #ffffff; color: #0d3a9e; }
+body.light .send-btn:hover { background: #dceeff; transform: scale(1.06); }
+
+/* Symptom card */
+body.light .symptom-card {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(3,16,30,0.12);
+}
+body.light .symptom-card h3 { color: var(--text-primary); }
+body.light .symptom-card p  { color: var(--text-secondary); }
+
+/* Body silhouette — deep navy for maximum contrast vs bright-blue bg */
 body.light .body-silhouette {
   background: linear-gradient(180deg, #0f3db8 0%, #0a2f9e 55%, #072482 100%);
   border: 1px solid rgba(255,255,255,0.22);
 }
 body.light .body-silhouette::before,
 body.light .body-silhouette::after { background: rgba(255,255,255,0.24); }
-/* Hotspots — white outlines against the dark silhouette */
-body.light .body-part { border-color: rgba(255,255,255,0.52); background: rgba(255,255,255,0.12); }
-body.light .body-part:hover, body.light .body-part:focus { background: rgba(255,255,255,0.34); border-color: rgba(255,255,255,0.84); }
-body.light .body-part.active { background: rgba(255,255,255,0.46); border-color: #ffffff; }
-body.light .body-part::after { background: rgba(10,47,158,0.97); color: #ffffff; border-color: rgba(255,255,255,0.30); }
+body.light .body-part { border-color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.14); }
+body.light .body-part:hover,
+body.light .body-part:focus { background: rgba(255,255,255,0.36); border-color: rgba(255,255,255,0.86); }
+body.light .body-part.active { background: rgba(255,255,255,0.48); border-color: #ffffff; }
+body.light .body-part::after { background: rgba(8,38,126,0.97); color: #ffffff; border-color: rgba(255,255,255,0.28); }
 
 /* Region question panel */
-body.light .region-question-panel { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.20); }
-body.light .question-choice button { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.24); color: #ffffff; }
-body.light .question-choice button:hover { background: rgba(255,255,255,0.22); }
-body.light .question-choice button.selected { background: rgba(255,255,255,0.30); border-color: rgba(255,255,255,0.65); color: #ffffff; font-weight: 600; }
-body.light .question-input { background: rgba(255,255,255,0.12); color: #ffffff; border-color: rgba(255,255,255,0.28); }
-body.light .question-input::placeholder { color: rgba(255,255,255,0.50); }
-body.light .primary-btn { background: #ffffff; color: #1a5fd8; }
-body.light .secondary-btn { background: rgba(255,255,255,0.12); color: #ffffff; border-color: rgba(255,255,255,0.25); }
-
-/* Input zone & card */
-body.light .input-zone::before { background: linear-gradient(to top, var(--navy-950), transparent); }
-body.light .input-card { background: var(--navy-800); border-color: var(--border-mid); }
-body.light .chat-ta::placeholder { color: rgba(255,255,255,0.48); }
-
-/* Scroll bar */
-body.light .scroll-track { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.16); }
-
-/* Typing bubble */
-body.light .typing-bub { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
-
-/* Disclaimer pill */
-body.light .disclaimer-pill { background: rgba(251,191,36,0.16); border-color: rgba(251,191,36,0.32); color: #fbbf24; }
+body.light .region-question-panel {
+  background: rgba(255,255,255,0.30);
+  border-color: rgba(3,16,30,0.14);
+}
+body.light .region-question-header span  { color: var(--text-muted); }
+body.light .region-question-header strong{ color: var(--text-primary); }
+body.light .question-label { color: var(--text-primary); }
+body.light .question-choice button {
+  background: rgba(255,255,255,0.36);
+  border-color: rgba(3,16,30,0.16);
+  color: var(--text-primary);
+}
+body.light .question-choice button:hover { background: rgba(255,255,255,0.54); }
+body.light .question-choice button.selected {
+  background: rgba(47,158,255,0.20);
+  border-color: rgba(47,158,255,0.55);
+  color: #0d3a9e;
+  font-weight: 600;
+}
+body.light .question-input {
+  background: rgba(255,255,255,0.36);
+  color: var(--text-primary);
+  border-color: rgba(3,16,30,0.16);
+}
+body.light .question-input::placeholder { color: rgba(3,16,30,0.38); }
+body.light .primary-btn   { background: #0d3a9e; color: #ffffff; }
+body.light .secondary-btn { background: rgba(255,255,255,0.26); color: var(--text-primary); border-color: rgba(3,16,30,0.18); }
 
 /* Follow-up suggestion buttons */
-body.light .follow-up-btn { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); color: #ffffff; }
-body.light .follow-up-btn:hover:not(:disabled) { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.45); }
-
-/* Search wrap */
-body.light .search-wrap { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
-body.light .search-wrap input::placeholder { color: rgba(255,255,255,0.50); }
-
-/* Conversation list items */
-body.light .conv-item:hover { background: rgba(255,255,255,0.10); }
-body.light .conv-item.active { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.32); }
-
-/* Message bubble tones */
-body.light .b-ai   { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
-body.light .b-user { background: rgba(10,47,158,0.50);   border-color: rgba(255,255,255,0.18); }
-
-/* Icon / toggle buttons on blue topbar */
-body.light .icon-btn, body.light .toggle-btn, body.light .theme-toggle-btn {
-  border-color: rgba(255,255,255,0.22);
-  color: rgba(255,255,255,0.82);
+body.light .follow-up-questions { border-top-color: rgba(3,16,30,0.14); }
+body.light .follow-up-title { color: var(--text-secondary); }
+body.light .follow-up-btn {
+  background: rgba(255,255,255,0.32);
+  border-color: rgba(3,16,30,0.14);
+  color: var(--text-primary);
 }
-body.light .icon-btn:hover, body.light .toggle-btn:hover, body.light .theme-toggle-btn:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.40);
-  color: #ffffff;
+body.light .follow-up-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.50);
+  border-color: rgba(47,158,255,0.42);
+  color: #0d3a9e;
 }
+
+/* Typing indicator */
+body.light .typing-bub { background: rgba(255,255,255,0.36); border-color: rgba(3,16,30,0.12); }
+
+/* Scroll bar */
+body.light .scroll-track { background: rgba(3,16,30,0.10); border-color: rgba(3,16,30,0.14); }
 
 /* Theme toggle button active state */
 .theme-toggle-btn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--border-faint); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all .2s; position: relative; overflow: hidden; }
