@@ -1103,71 +1103,75 @@ html, body {
 
 /* ─── Light Mode ──────────────────────────────── */
 body.light {
-  --navy-950: #f0f5fb;
-  --navy-900: #e4edf7;
-  --navy-850: #d8e6f2;
-  --navy-800: #c7d9ec;
-  --navy-700: #adc6e0;
-  --navy-600: #8aaece;
-  --navy-400: #4e85bc;
-  --navy-300: #2c6ba6;
-  --navy-200: #1a5090;
-  --navy-100: #0d3470;
+  /* Surfaces — noticeably deeper steel-blue tones */
+  --navy-950: #d6e5f3;
+  --navy-900: #c4d8ed;
+  --navy-850: #b5cce6;
+  --navy-800: #a3bedd;
+  --navy-700: #8aaece;
+  --navy-600: #6d9bbf;
+  --navy-400: #3e74aa;
+  --navy-300: #245f96;
+  --navy-200: #124d82;
+  --navy-100: #083b6e;
 
-  --accent:      #1a6fc4;
-  --accent-dim:  rgba(26,111,196,0.10);
-  --accent-mid:  rgba(26,111,196,0.26);
-  --accent-glow: #1557a8;
+  --accent:      #1160b8;
+  --accent-dim:  rgba(17,96,184,0.12);
+  --accent-mid:  rgba(17,96,184,0.28);
+  --accent-glow: #0e4f9e;
 
-  --teal:     #0891b2;
-  --teal-dim: rgba(8,145,178,0.10);
+  --teal:     #0779a0;
+  --teal-dim: rgba(7,121,160,0.12);
 
-  --amber:     #d97706;
-  --amber-dim: rgba(217,119,6,0.10);
+  --amber:     #b45309;
+  --amber-dim: rgba(180,83,9,0.12);
 
-  --red:     #dc2626;
-  --red-dim: rgba(220,38,38,0.08);
+  --red:     #b91c1c;
+  --red-dim: rgba(185,28,28,0.10);
 
-  --green:     #16a34a;
-  --green-dim: rgba(22,163,74,0.08);
+  --green:     #15803d;
+  --green-dim: rgba(21,128,61,0.10);
 
-  --text-primary:   #0c2040;
-  --text-secondary: #284e7e;
-  --text-muted:     #6b8fb0;
+  /* Text — high contrast against the deeper blue surfaces */
+  --text-primary:   #05131f;
+  --text-secondary: #163352;
+  --text-muted:     #3d6080;
 
-  --border-faint:  rgba(12,32,64,0.07);
-  --border-subtle: rgba(12,32,64,0.12);
-  --border-mid:    rgba(12,32,64,0.18);
+  --border-faint:  rgba(5,19,31,0.10);
+  --border-subtle: rgba(5,19,31,0.16);
+  --border-mid:    rgba(5,19,31,0.24);
 }
 
 /* Topbar background override (hardcoded rgba in base) */
 body.light .topbar {
-  background: rgba(224,236,249,0.94);
-  border-bottom-color: rgba(12,32,64,0.10);
+  background: rgba(196,216,237,0.96);
+  border-bottom-color: rgba(5,19,31,0.14);
 }
 /* Sidebar border */
-body.light .sidebar { border-right-color: rgba(12,32,64,0.10); }
+body.light .sidebar { border-right-color: rgba(5,19,31,0.12); }
 
 /* Symptom card */
-body.light .symptom-card { background: rgba(224,236,249,0.92); }
+body.light .symptom-card { background: rgba(196,216,237,0.95); }
 
-/* Body silhouette — hardcoded dark gradient */
+/* Body silhouette — distinct darker-blue gradient for contrast */
 body.light .body-silhouette {
-  background: linear-gradient(180deg, rgba(208,228,248,.98) 0%, rgba(188,214,238,.96) 50%, rgba(166,198,226,.92) 100%);
-  border-color: rgba(12,32,64,0.14);
+  background: linear-gradient(180deg, rgba(155,195,230,.98) 0%, rgba(128,174,215,.97) 50%, rgba(100,152,198,.94) 100%);
+  border: 1px solid rgba(17,96,184,0.30);
 }
+/* Spine / shoulder guide lines — visible on the new background */
 body.light .body-silhouette::before,
-body.light .body-silhouette::after { background: rgba(12,32,64,0.09); }
-body.light .body-part { border-color: rgba(26,111,196,0.30); background: rgba(26,111,196,0.08); }
-body.light .body-part:hover, body.light .body-part:focus { background: rgba(26,111,196,0.22); border-color: rgba(26,111,196,0.60); }
-body.light .body-part.active { background: rgba(26,111,196,0.32); border-color: rgba(26,111,196,0.72); }
-body.light .body-part::after { background: rgba(224,236,249,0.96); color: var(--text-primary); border-color: rgba(12,32,64,0.12); }
+body.light .body-silhouette::after { background: rgba(17,96,184,0.28); }
+/* Body-part hotspots — clear outlines, visible fill */
+body.light .body-part { border-color: rgba(17,96,184,0.55); background: rgba(17,96,184,0.18); }
+body.light .body-part:hover, body.light .body-part:focus { background: rgba(17,96,184,0.38); border-color: rgba(17,96,184,0.80); }
+body.light .body-part.active { background: rgba(17,96,184,0.48); border-color: rgba(17,96,184,0.90); }
+body.light .body-part::after { background: rgba(196,216,237,0.97); color: var(--text-primary); border-color: rgba(5,19,31,0.18); }
 
 /* Region question panel */
-body.light .region-question-panel { background: rgba(224,236,249,0.95); }
-body.light .question-choice button { background: var(--navy-900); border-color: var(--border-faint); }
-body.light .question-choice button.selected { background: rgba(26,111,196,0.18); border-color: rgba(26,111,196,0.50); }
-body.light .question-input { background: rgba(255,255,255,0.60); color: var(--text-primary); border-color: var(--border-subtle); }
+body.light .region-question-panel { background: rgba(196,216,237,0.97); }
+body.light .question-choice button { background: var(--navy-900); border-color: var(--border-subtle); color: var(--text-primary); }
+body.light .question-choice button.selected { background: rgba(17,96,184,0.22); border-color: rgba(17,96,184,0.58); color: var(--accent); }
+body.light .question-input { background: rgba(255,255,255,0.50); color: var(--text-primary); border-color: var(--border-subtle); }
 
 /* Input zone fade */
 body.light .input-zone::before { background: linear-gradient(to top, var(--navy-950), transparent); }
