@@ -1107,7 +1107,7 @@ html, body {
     Topbar/sidebar stay deep blue → white text there.
     Main content surfaces are lightened → very dark navy text.   */
 body.light {
-  --navy-950: #3d82f6;
+  --navy-950: #d8e8f2;   /* chat / page background — user reference colour */
   --navy-900: #2e76f4;
   --navy-850: #2068ee;
   --navy-800: #175ce4;
@@ -1201,15 +1201,15 @@ body.light .conv-del:hover    { color: #f87171; }
 body.light .disclaimer-pill   { background: rgba(251,191,36,0.16); border-color: rgba(251,191,36,0.34); color: #fbbf24; }
 
 /* ── Main content: lightened surfaces + dark navy text ──────── */
-/* Chat bubbles — semi-transparent white so dark text reads */
+/* Chat bubbles — solid whites so they pop off the pale bg */
 body.light .b-ai {
-  background: rgba(255,255,255,0.50);
-  border-color: rgba(3,16,30,0.12);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.10);
   color: var(--text-primary);
 }
 body.light .b-user {
-  background: rgba(255,255,255,0.32);
-  border-color: rgba(3,16,30,0.10);
+  background: rgba(47,158,255,0.13);
+  border-color: rgba(47,158,255,0.30);
   color: var(--text-primary);
 }
 body.light .bubble strong { color: #0d3a9e; }
@@ -1227,21 +1227,21 @@ body.light .welcome-h    { color: var(--text-primary); }
 body.light .welcome-intro{ color: #0d3a9e; }
 body.light .welcome-p    { color: var(--text-secondary); }
 body.light .starter {
-  background: rgba(255,255,255,0.30);
-  border-color: rgba(3,16,30,0.12);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.10);
 }
 body.light .starter:hover {
-  background: rgba(255,255,255,0.46);
-  border-color: rgba(47,158,255,0.40);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  background: #ffffff;
+  border-color: rgba(47,158,255,0.42);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 body.light .s-lbl         { color: var(--text-primary); }
 body.light .s-lbl span    { color: var(--text-secondary); }
 
 /* Input card */
 body.light .input-card {
-  background: rgba(255,255,255,0.28);
-  border-color: rgba(3,16,30,0.18);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.16);
 }
 body.light .input-card:focus-within { border-color: rgba(47,158,255,0.50); }
 body.light .chat-ta { color: var(--text-primary); caret-color: #0d3a9e; }
@@ -1255,8 +1255,8 @@ body.light .send-btn:hover { background: #dceeff; transform: scale(1.06); }
 
 /* Symptom card */
 body.light .symptom-card {
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(3,16,30,0.12);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.10);
 }
 body.light .symptom-card h3 { color: var(--text-primary); }
 body.light .symptom-card p  { color: var(--text-secondary); }
@@ -1276,18 +1276,18 @@ body.light .body-part::after { background: rgba(8,38,126,0.97); color: #ffffff; 
 
 /* Region question panel */
 body.light .region-question-panel {
-  background: rgba(255,255,255,0.30);
-  border-color: rgba(3,16,30,0.14);
+  background: #f4f8fb;
+  border-color: rgba(3,16,30,0.10);
 }
 body.light .region-question-header span  { color: var(--text-muted); }
 body.light .region-question-header strong{ color: var(--text-primary); }
 body.light .question-label { color: var(--text-primary); }
 body.light .question-choice button {
-  background: rgba(255,255,255,0.36);
-  border-color: rgba(3,16,30,0.16);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.14);
   color: var(--text-primary);
 }
-body.light .question-choice button:hover { background: rgba(255,255,255,0.54); }
+body.light .question-choice button:hover { background: #edf4fb; }
 body.light .question-choice button.selected {
   background: rgba(47,158,255,0.20);
   border-color: rgba(47,158,255,0.55);
@@ -1295,9 +1295,9 @@ body.light .question-choice button.selected {
   font-weight: 600;
 }
 body.light .question-input {
-  background: rgba(255,255,255,0.36);
+  background: #ffffff;
   color: var(--text-primary);
-  border-color: rgba(3,16,30,0.16);
+  border-color: rgba(3,16,30,0.14);
 }
 body.light .question-input::placeholder { color: rgba(3,16,30,0.38); }
 body.light .primary-btn   { background: #0d3a9e; color: #ffffff; }
@@ -1307,21 +1307,21 @@ body.light .secondary-btn { background: rgba(255,255,255,0.26); color: var(--tex
 body.light .follow-up-questions { border-top-color: rgba(3,16,30,0.14); }
 body.light .follow-up-title { color: var(--text-secondary); }
 body.light .follow-up-btn {
-  background: rgba(255,255,255,0.32);
-  border-color: rgba(3,16,30,0.14);
+  background: #ffffff;
+  border-color: rgba(3,16,30,0.10);
   color: var(--text-primary);
 }
 body.light .follow-up-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.50);
-  border-color: rgba(47,158,255,0.42);
+  background: #edf4fb;
+  border-color: rgba(47,158,255,0.40);
   color: #0d3a9e;
 }
 
 /* Typing indicator */
-body.light .typing-bub { background: rgba(255,255,255,0.36); border-color: rgba(3,16,30,0.12); }
+body.light .typing-bub { background: #ffffff; border-color: rgba(3,16,30,0.10); }
 
 /* Scroll bar */
-body.light .scroll-track { background: rgba(3,16,30,0.10); border-color: rgba(3,16,30,0.14); }
+body.light .scroll-track { background: rgba(3,16,30,0.08); border-color: rgba(3,16,30,0.12); }
 
 /* Theme toggle button active state */
 .theme-toggle-btn { width: 34px; height: 34px; border-radius: var(--r-sm); border: 1px solid var(--border-faint); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all .2s; position: relative; overflow: hidden; }
